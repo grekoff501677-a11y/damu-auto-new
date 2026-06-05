@@ -3,7 +3,9 @@ import { Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { MobileTabBar } from '@/components/layout/MobileTabBar'
 import { PageTransition } from '@/components/shared/PageTransition'
+import { CookieConsent } from '@/components/shared/CookieConsent'
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -40,6 +42,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <PageTransition>{children}</PageTransition>
         </main>
         <Footer />
+        {/* spacer so fixed mobile tab bar never covers footer content */}
+        <div className="h-24 md:hidden" aria-hidden />
+        <MobileTabBar />
+        <CookieConsent />
       </body>
     </html>
   )

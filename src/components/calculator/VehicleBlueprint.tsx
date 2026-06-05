@@ -23,8 +23,8 @@ export function VehicleBlueprint({ active, className }: Props) {
       <svg viewBox="0 0 400 220" fill="none" className="h-full w-full">
         <defs>
           <linearGradient id="bp-stroke" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#00E676" stopOpacity="0.7" />
+            <stop offset="0%" stopColor="#D9B870" stopOpacity="0.95" />
+            <stop offset="100%" stopColor="#C49A45" stopOpacity="0.7" />
           </linearGradient>
           <filter id="bp-glow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="3" result="b" />
@@ -90,7 +90,7 @@ export function VehicleBlueprint({ active, className }: Props) {
               {isOn && (
                 <motion.circle
                   cx={node.x} cy={node.y} r="18"
-                  fill="#00E676" fillOpacity="0.12"
+                  fill="#C49A45" fillOpacity="0.14"
                   initial={{ scale: 0 }} animate={{ scale: [1, 1.35, 1] }}
                   transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                 />
@@ -98,7 +98,7 @@ export function VehicleBlueprint({ active, className }: Props) {
               <motion.circle
                 cx={node.x} cy={node.y} r="4.5"
                 animate={{
-                  fill: isOn ? '#00E676' : 'rgba(255,255,255,0.2)',
+                  fill: isOn ? '#C49A45' : 'rgba(255,255,255,0.2)',
                   filter: isOn ? 'url(#bp-glow)' : 'none',
                 }}
                 transition={{ duration: 0.3 }}

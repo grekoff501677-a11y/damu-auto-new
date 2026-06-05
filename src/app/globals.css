@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
-   DAMU AUTO — Premium Dark High-Tech Theme
-   Matte charcoal · glassmorphism · LED-signature accents
+   DAMU AUTO — Brand Theme
+   Deep Oceanic Midnight Blue · Noble Gold/Bronze accents
    ============================================================ */
 
 @theme inline {
@@ -29,7 +29,8 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  --color-ice: var(--ice);
+  --color-gold: var(--accent);
+  --color-gold-soft: var(--gold-soft);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
@@ -54,68 +55,64 @@
 }
 
 :root {
-  /* ── Matte dark canvas (NOT pitch black) ── */
-  --background:        #0B0C10;   /* deep matte charcoal */
-  --foreground:        #EDEEF2;   /* off-white */
+  /* ── Deep oceanic midnight canvas ── */
+  --background:        #061521;   /* deepest midnight */
+  --foreground:        #FFFFFF;   /* pure white */
 
-  --surface:           #12131C;   /* raised panel */
-  --surface-raised:    #181A24;   /* card surface */
-  --glass-border:      rgba(255, 255, 255, 0.06);
+  --surface:           #0B253A;   /* oceanic panel */
+  --surface-raised:    #0E2A42;   /* raised card */
+  --glass-border:      rgba(196, 154, 69, 0.12);
 
-  --card:              #12131C;
-  --card-foreground:   #EDEEF2;
-  --popover:           #12131C;
-  --popover-foreground:#EDEEF2;
+  --card:              #0B253A;
+  --card-foreground:   #FFFFFF;
+  --popover:           #0B253A;
+  --popover-foreground:#FFFFFF;
 
-  /* Primary = bright surface for solid buttons */
-  --primary:           #EDEEF2;
-  --primary-foreground:#0B0C10;
+  /* Primary = bright surface for solid light buttons */
+  --primary:           #FFFFFF;
+  --primary-foreground:#061521;
 
-  --secondary:         #181A24;
-  --secondary-foreground: #EDEEF2;
+  --secondary:         #0E2A42;
+  --secondary-foreground: #FFFFFF;
 
-  --muted:             #181A24;
-  --muted-foreground:  #8A8F9C;   /* secondary text */
+  --muted:             #0E2A42;
+  --muted-foreground:  #94A3B8;   /* desaturated blue-gray */
 
-  /* Accent = Verified LED Green */
-  --accent:            #00E676;
-  --accent-foreground: #04150B;
+  /* Accent = Noble Gold / Automotive Bronze */
+  --accent:            #C49A45;
+  --accent-foreground: #0B1A28;   /* dark ink on gold */
+  --gold-soft:         #D9B870;   /* lighter gold for gradients */
 
-  /* Cybernetic ice blue */
-  --ice:               #38BDF8;
+  --destructive:       #E5685F;
 
-  --destructive:       #FB5151;
+  --border:            rgba(196, 154, 69, 0.10);
+  --input:             rgba(196, 154, 69, 0.18);
+  --ring:              #C49A45;
 
-  --border:            rgba(255, 255, 255, 0.07);
-  --input:             rgba(255, 255, 255, 0.10);
-  --ring:              #00E676;
-
-  --chart-1:           #00E676;
-  --chart-2:           #38BDF8;
-  --chart-3:           #A78BFA;
-  --chart-4:           #FBBF24;
-  --chart-5:           #8A8F9C;
+  --chart-1:           #C49A45;
+  --chart-2:           #D9B870;
+  --chart-3:           #6B8CAE;
+  --chart-4:           #94A3B8;
+  --chart-5:           #0E2A42;
 
   --radius:            0.75rem;
 }
 
-/* Force dark color-scheme everywhere */
 :root { color-scheme: dark; }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
   html {
     @apply font-sans;
     scroll-behavior: smooth;
   }
   body {
     @apply bg-background text-foreground antialiased;
-    /* subtle ambient grain + radial glow */
+    /* warm golden ambient glow over oceanic base */
     background-image:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0, 230, 118, 0.06), transparent 60%),
-      radial-gradient(ellipse 60% 40% at 90% 10%, rgba(56, 189, 248, 0.04), transparent 60%);
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(196, 154, 69, 0.10), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 90% 5%, rgba(11, 37, 58, 0.6), transparent 60%),
+      linear-gradient(180deg, #061521 0%, #07192a 100%);
     background-attachment: fixed;
   }
   h1, h2, h3, h4 {
@@ -128,57 +125,59 @@
    Utility primitives
    ============================================================ */
 
-/* Glass panel */
 .glass {
-  background: rgba(18, 19, 28, 0.6);
+  background: rgba(11, 37, 58, 0.55);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
 }
-
 .glass-strong {
-  background: rgba(18, 19, 28, 0.85);
+  background: rgba(6, 21, 33, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
 }
 
-/* LED glow on hover (automotive signature) */
+/* Warm golden LED glow */
 .glow-accent {
-  box-shadow: 0 0 0 1px rgba(0, 230, 118, 0.2),
-              0 8px 30px -8px rgba(0, 230, 118, 0.35);
-}
-.glow-ice {
-  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.2),
-              0 8px 30px -8px rgba(56, 189, 248, 0.35);
+  box-shadow: 0 0 0 1px rgba(196, 154, 69, 0.25),
+              0 8px 30px -8px rgba(196, 154, 69, 0.45);
 }
 
-/* Text gradient */
 .text-gradient {
-  background: linear-gradient(135deg, #EDEEF2 0%, #8A8F9C 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #94A3B8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.text-gold-gradient {
+  background: linear-gradient(135deg, #D9B870 0%, #C49A45 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Thin grid backdrop (blueprint vibe) */
+/* Blueprint grid backdrop */
 .grid-backdrop {
   background-image:
-    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    linear-gradient(rgba(196,154,69,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(196,154,69,0.04) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
-/* Marquee animation */
+/* Marquee */
 @keyframes marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
-.animate-marquee {
-  animation: marquee 28s linear infinite;
-}
+.animate-marquee { animation: marquee 28s linear infinite; }
 
-/* Reduced motion */
+/* Min touch target helper (48x48) */
+.touch-target { min-height: 48px; min-width: 48px; }
+
+/* Hardware-accelerated, CLS-safe transforms */
+.gpu { transform: translateZ(0); will-change: transform; backface-visibility: hidden; }
+
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;
@@ -188,12 +187,15 @@
   }
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #0B0C10; }
+::-webkit-scrollbar-track { background: #061521; }
 ::-webkit-scrollbar-thumb {
-  background: #2A2D3A;
+  background: #1a3a52;
   border-radius: 8px;
-  border: 2px solid #0B0C10;
+  border: 2px solid #061521;
 }
-::-webkit-scrollbar-thumb:hover { background: #3A3D4A; }
+::-webkit-scrollbar-thumb:hover { background: #C49A45; }
+
+/* hide scrollbar for carousels */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

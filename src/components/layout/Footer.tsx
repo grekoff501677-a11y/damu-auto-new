@@ -13,9 +13,11 @@ const CATALOG_LINKS = [
 ]
 
 const INFO_LINKS = [
-  { href: '/calculator', label: 'Центр ТО' },
-  { href: '/blog',       label: 'Оригинал vs Подделка' },
-  { href: '/contact',   label: 'Связаться с нами' },
+  { href: '/calculator',     label: 'Центр ТО' },
+  { href: '/blog',           label: 'Оригинал vs Подделка' },
+  { href: '/contact',       label: 'Связаться с нами' },
+  { href: '/privacy-policy', label: 'Политика конфиденциальности' },
+  { href: '/data-consent',   label: 'Обработка данных' },
 ]
 
 const InstagramIcon = ({ className }: { className?: string }) => (
@@ -40,7 +42,7 @@ export function Footer() {
           <div className="col-span-1 sm:col-span-2 lg:col-span-1">
             <Link href="/" className="inline-flex items-center gap-2.5 cursor-pointer">
               <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 ring-1 ring-accent/30">
-                <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_12px_2px_rgba(0,230,118,0.7)]" />
+                <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_12px_2px_rgba(196,154,69,0.7)]" />
               </span>
               <span className="font-heading text-lg font-700 tracking-tight">
                 Damu<span className="text-accent">Auto</span>

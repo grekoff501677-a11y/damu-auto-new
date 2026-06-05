@@ -30,7 +30,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 pb-16 md:pt-28">
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-glass-border bg-surface/60 px-3 py-1 text-xs font-500 text-muted-foreground backdrop-blur-md">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgba(0,230,118,0.6)]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgba(196,154,69,0.6)]" />
               Экспертный хаб · Павлодар
             </span>
           </Reveal>
@@ -53,13 +53,13 @@ export default function HomePage() {
           <Reveal delay={0.24}>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/catalog">
-                <button className="group flex items-center gap-2 rounded-xl bg-accent px-6 py-3.5 text-sm font-700 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_28px_-4px_rgba(0,230,118,0.7)] cursor-pointer">
+                <button className="group flex min-h-12 items-center gap-2 rounded-xl bg-accent px-6 text-sm font-700 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_28px_-4px_rgba(196,154,69,0.7)] cursor-pointer">
                   Открыть каталог
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </button>
               </Link>
               <Link href="/calculator">
-                <button className="flex items-center gap-2 rounded-xl border border-input bg-surface/60 px-6 py-3.5 text-sm font-600 backdrop-blur-md transition-colors hover:border-accent/40 cursor-pointer">
+                <button className="flex min-h-12 items-center gap-2 rounded-xl border border-input bg-surface/60 px-6 text-sm font-600 backdrop-blur-md transition-colors hover:border-accent/40 cursor-pointer">
                   <Wrench className="h-4 w-4" />
                   Центр ТО
                 </button>
