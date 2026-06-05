@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { MapPin, Phone, ExternalLink } from 'lucide-react'
 
@@ -41,9 +42,14 @@ export function Footer() {
 
           <div className="col-span-1 sm:col-span-2 lg:col-span-1">
             <Link href="/" className="inline-flex items-center gap-2.5 cursor-pointer">
-              <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 ring-1 ring-accent/30">
-                <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_12px_2px_rgba(196,154,69,0.7)]" />
-              </span>
+              <Image
+                src="/images/logo.png"
+                alt="Damu Auto"
+                width={36}
+                height={36}
+                sizes="36px"
+                className="h-9 w-9 rounded-full ring-1 ring-accent/30"
+              />
               <span className="font-heading text-lg font-700 tracking-tight">
                 Damu<span className="text-accent">Auto</span>
               </span>

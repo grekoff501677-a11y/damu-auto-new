@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { motion } from 'motion/react'
@@ -68,9 +69,15 @@ export function Header() {
           )}
         >
           <Link href="/" className="group flex items-center gap-2.5 cursor-pointer select-none">
-            <span className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10 ring-1 ring-accent/30">
-              <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_12px_2px_rgba(196,154,69,0.7)]" />
-            </span>
+            <Image
+              src="/images/logo.png"
+              alt="Damu Auto"
+              width={40}
+              height={40}
+              priority
+              sizes="40px"
+              className="h-10 w-10 rounded-full ring-1 ring-accent/30 transition-shadow duration-200 group-hover:shadow-[0_0_16px_-2px_rgba(196,154,69,0.6)]"
+            />
             <span className="font-heading text-lg font-700 tracking-tight text-foreground">
               Damu<span className="text-accent">Auto</span>
             </span>

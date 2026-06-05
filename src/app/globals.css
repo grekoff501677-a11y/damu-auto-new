@@ -31,6 +31,11 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-gold: var(--accent);
   --color-gold-soft: var(--gold-soft);
+
+  /* Direct corporate brand tokens (Damu Auto identity) */
+  --color-brand-deep: #061521;   /* deepest midnight */
+  --color-brand-navy: #0B253A;   /* oceanic panel */
+  --color-brand-gold: #C49A45;   /* noble gold / bronze */
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
