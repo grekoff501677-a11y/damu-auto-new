@@ -4,134 +4,196 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================================
+   DAMU AUTO — Premium Dark High-Tech Theme
+   Matte charcoal · glassmorphism · LED-signature accents
+   ============================================================ */
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+
+  --font-heading: var(--font-space-grotesk);
+  --font-sans: var(--font-satoshi);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
+
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ice: var(--ice);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-glass-border: var(--glass-border);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-3xl: calc(var(--radius) * 2.6);
 }
 
 :root {
-  /* ── Damu Auto Design Tokens ── */
-  /* Charcoal / White / Verified-Green palette */
-  --background: oklch(0.99 0 0);           /* #FAFAFA — near-white */
-  --foreground: oklch(0.18 0.008 264);     /* #1E2229 — deep charcoal */
-  --card: oklch(1 0 0);                    /* #FFFFFF */
-  --card-foreground: oklch(0.18 0.008 264);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.008 264);
+  /* ── Matte dark canvas (NOT pitch black) ── */
+  --background:        #0B0C10;   /* deep matte charcoal */
+  --foreground:        #EDEEF2;   /* off-white */
 
-  /* Primary = charcoal (interactive dark) */
-  --primary: oklch(0.22 0.01 264);         /* #252C35 */
-  --primary-foreground: oklch(0.98 0 0);
+  --surface:           #12131C;   /* raised panel */
+  --surface-raised:    #181A24;   /* card surface */
+  --glass-border:      rgba(255, 255, 255, 0.06);
 
-  /* Secondary = light gray surface */
-  --secondary: oklch(0.96 0 0);            /* #F4F4F5 */
-  --secondary-foreground: oklch(0.22 0.01 264);
+  --card:              #12131C;
+  --card-foreground:   #EDEEF2;
+  --popover:           #12131C;
+  --popover-foreground:#EDEEF2;
 
-  /* Accent = Verified Green */
-  --accent: oklch(0.65 0.17 145);          /* #22C55E-ish */
-  --accent-foreground: oklch(0.98 0 0);
+  /* Primary = bright surface for solid buttons */
+  --primary:           #EDEEF2;
+  --primary-foreground:#0B0C10;
 
-  --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.50 0.01 264); /* #71717A — secondary text */
-  --destructive: oklch(0.577 0.245 27.325);
+  --secondary:         #181A24;
+  --secondary-foreground: #EDEEF2;
 
-  --border: oklch(0.91 0 0);               /* #E5E7EB */
-  --input: oklch(0.91 0 0);
-  --ring: oklch(0.65 0.17 145);            /* Green focus ring */
+  --muted:             #181A24;
+  --muted-foreground:  #8A8F9C;   /* secondary text */
 
-  --radius: 0.5rem;
+  /* Accent = Verified LED Green */
+  --accent:            #00E676;
+  --accent-foreground: #04150B;
 
-  --sidebar: oklch(0.98 0 0);
-  --sidebar-foreground: oklch(0.18 0.008 264);
-  --sidebar-primary: oklch(0.22 0.01 264);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.96 0 0);
-  --sidebar-accent-foreground: oklch(0.22 0.01 264);
-  --sidebar-border: oklch(0.91 0 0);
-  --sidebar-ring: oklch(0.65 0.17 145);
+  /* Cybernetic ice blue */
+  --ice:               #38BDF8;
+
+  --destructive:       #FB5151;
+
+  --border:            rgba(255, 255, 255, 0.07);
+  --input:             rgba(255, 255, 255, 0.10);
+  --ring:              #00E676;
+
+  --chart-1:           #00E676;
+  --chart-2:           #38BDF8;
+  --chart-3:           #A78BFA;
+  --chart-4:           #FBBF24;
+  --chart-5:           #8A8F9C;
+
+  --radius:            0.75rem;
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
+/* Force dark color-scheme everywhere */
+:root { color-scheme: dark; }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
+    @apply border-border;
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    /* subtle ambient grain + radial glow */
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0, 230, 118, 0.06), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 10%, rgba(56, 189, 248, 0.04), transparent 60%);
+    background-attachment: fixed;
+  }
+  h1, h2, h3, h4 {
+    @apply font-heading;
+    letter-spacing: -0.02em;
   }
 }
+
+/* ============================================================
+   Utility primitives
+   ============================================================ */
+
+/* Glass panel */
+.glass {
+  background: rgba(18, 19, 28, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-strong {
+  background: rgba(18, 19, 28, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+}
+
+/* LED glow on hover (automotive signature) */
+.glow-accent {
+  box-shadow: 0 0 0 1px rgba(0, 230, 118, 0.2),
+              0 8px 30px -8px rgba(0, 230, 118, 0.35);
+}
+.glow-ice {
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.2),
+              0 8px 30px -8px rgba(56, 189, 248, 0.35);
+}
+
+/* Text gradient */
+.text-gradient {
+  background: linear-gradient(135deg, #EDEEF2 0%, #8A8F9C 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Thin grid backdrop (blueprint vibe) */
+.grid-backdrop {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Marquee animation */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #0B0C10; }
+::-webkit-scrollbar-thumb {
+  background: #2A2D3A;
+  border-radius: 8px;
+  border: 2px solid #0B0C10;
+}
+::-webkit-scrollbar-thumb:hover { background: #3A3D4A; }

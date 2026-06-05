@@ -1,15 +1,19 @@
-// Phase 4 — Interactive Maintenance Calculator
-// TODO: implement MaintenanceCalculator component
+import { MaintenanceCenter } from '@/components/calculator/MaintenanceCenter'
+
+export const metadata = { title: 'Центр ТО' }
+
 export default function CalculatorPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="font-[family-name:var(--font-rubik)] text-3xl font-600 text-foreground mb-2">
-        Калькулятор ТО
-      </h1>
-      <p className="text-muted-foreground mb-8">
-        Введите пробег — получите персональный чек-лист замены и проверки
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-12 pb-16">
+      <p className="text-xs font-600 uppercase tracking-widest text-accent">Контрольный центр</p>
+      <h1 className="mt-2 font-heading text-4xl font-700 tracking-tight">Калькулятор обслуживания</h1>
+      <p className="mt-3 max-w-xl text-muted-foreground leading-relaxed">
+        Выберите модель и точку на временной шкале — система подсветит узлы автомобиля
+        и покажет, что заменить и проверить, с точными OEM-номерами.
       </p>
-      {/* TODO: <MaintenanceCalculator /> */}
+      <div className="mt-10">
+        <MaintenanceCenter />
+      </div>
     </div>
   )
 }
