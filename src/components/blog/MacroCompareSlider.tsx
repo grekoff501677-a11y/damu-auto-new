@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 type Side = {
   label: string
   image?: string
-  texture: string
+  texture?: string
 }
 
 type Props = {

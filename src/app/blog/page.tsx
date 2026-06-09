@@ -1,50 +1,54 @@
-import { MacroCompareSlider } from '@/components/blog/MacroCompareSlider'
+import Link from 'next/link'
+import { ChevronRight, FileText } from 'lucide-react'
 import { Reveal } from '@/components/shared/Reveal'
-import {
-  TEXTURE_ORIGINAL_FILTER, TEXTURE_FAKE_FILTER,
-  TEXTURE_ORIGINAL_FLUID, TEXTURE_FAKE_FLUID,
-} from '@/lib/textures'
+import { getPublishedPosts } from '@/lib/queries'
 
 export const metadata = { title: 'Оригинал vs Подделка' }
+export const dynamic = 'force-dynamic'
 
-const GUIDES = [
-  {
-    title: 'Масляный фильтр Geely: оригинал против подделки',
-    caption: 'Структура фильтровальной бумаги · ×2.6',
-    original: { label: 'Оригинал', texture: TEXTURE_ORIGINAL_FILTER },
-    counterfeit: { label: 'Подделка', texture: TEXTURE_FAKE_FILTER },
-    text: 'У оригинала плотная равномерная гофра и одинаковая толщина волокон. Подделка выдаёт себя рыхлой, неравномерной структурой и инородными вкраплениями.',
-  },
-  {
-    title: 'Антифриз LEC II: плотность жидкости',
-    caption: 'Однородность раствора · ×2.6',
-    original: { label: 'Оригинал', texture: TEXTURE_ORIGINAL_FLUID },
-    counterfeit: { label: 'Подделка', texture: TEXTURE_FAKE_FLUID },
-    text: 'Оригинальный концентрат однороден по всей массе. Подделка расслаивается, образует мутные пятна и осадок.',
-  },
-]
+export default async function BlogPage() {
+  const posts = await getPublishedPosts()
 
-export default function BlogPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pt-12 pb-16">
       <p className="text-xs font-600 uppercase tracking-widest text-accent">Экспертный блог</p>
       <h1 className="mt-2 font-heading text-4xl font-700 tracking-tight">Оригинал vs Подделка</h1>
       <p className="mt-3 max-w-xl text-muted-foreground leading-relaxed">
-        Включите макро-линзу и наведите курсор на сравнение, чтобы рассмотреть
-        детали структуры под увеличением.
+        Обновления магазина и образовательные материалы по проверке подлинности запчастей.
       </p>
 
-      <div className="mt-12 space-y-16">
-        {GUIDES.map((g, i) => (
-          <Reveal key={g.title} delay={i * 0.05}>
-            <article className="glass rounded-3xl p-5 sm:p-7">
-              <h2 className="mb-1 font-heading text-2xl font-700">{g.title}</h2>
-              <p className="mb-5 max-w-2xl text-sm leading-relaxed text-muted-foreground">{g.text}</p>
-              <MacroCompareSlider original={g.original} counterfeit={g.counterfeit} caption={g.caption} />
-            </article>
-          </Reveal>
-        ))}
-      </div>
+      {posts.length === 0 ? (
+        <div className="glass mt-12 flex flex-col items-center justify-center rounded-2xl p-16 text-center">
+          <FileText className="mb-3 h-8 w-8 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">Статьи скоро появятся. Загляните позже.</p>
+        </div>
+      ) : (
+        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {posts.map((p, i) => (
+            <Reveal key={p.id} delay={Math.min(i * 0.05, 0.25)}>
+              <Link href={`/blog/${p.slug}`} className="group block h-full">
+                <article className="glass flex h-full flex-col overflow-hidden rounded-2xl transition-colors duration-200 hover:border-accent/30">
+                  <div className="relative aspect-[16/9] overflow-hidden"
+                    style={{ background: p.cover_image ? undefined : 'linear-gradient(160deg,#0B253A,#061521)' }}>
+                    {p.cover_image && <img src={p.cover_image} alt={p.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+                    <div className="absolute inset-0 grid-backdrop opacity-30" />
+                    <span className="absolute left-3 top-3 rounded-full border border-accent/25 bg-black/50 px-2.5 py-1 text-[10px] font-600 text-accent backdrop-blur-md">
+                      {p.category === 'guide' ? 'Гид' : 'Обновление'}
+                    </span>
+                  </div>
+                  <div className="flex flex-1 flex-col p-5">
+                    <h2 className="font-heading text-lg font-700 leading-snug">{p.title}</h2>
+                    {p.excerpt && <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-3">{p.excerpt}</p>}
+                    <span className="mt-4 inline-flex items-center gap-1 text-xs font-600 text-accent">
+                      Читать <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                  </div>
+                </article>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

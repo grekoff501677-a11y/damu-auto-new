@@ -4,13 +4,12 @@ import { Reveal } from '@/components/shared/Reveal'
 import { MaintenanceCenter } from '@/components/calculator/MaintenanceCenter'
 import { MacroCompareSlider } from '@/components/blog/MacroCompareSlider'
 import { LeadForm } from '@/components/forms/LeadForm'
+import { getMaintenanceModels, getCarModels } from '@/lib/queries'
 import {
   TEXTURE_ORIGINAL_FILTER, TEXTURE_FAKE_FILTER,
 } from '@/lib/textures'
 
-const CAR_MODELS = [
-  'Geely Atlas', 'Geely Monjaro', 'Geely Coolray', 'Geely Okavango',
-]
+export const dynamic = 'force-dynamic'
 
 const FEATURES = [
   { icon: ShieldCheck, title: 'Только оригинал', desc: 'Каждая позиция с OEM-номером и гидом по проверке подлинности.' },
@@ -18,7 +17,8 @@ const FEATURES = [
   { icon: ExternalLink, title: 'Заказ через Kaspi', desc: 'Прямые ссылки на каждый товар — привычная оплата и доставка.' },
 ]
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [maintModels, carModels] = await Promise.all([getMaintenanceModels(), getCarModels()])
   return (
     <div className="flex flex-col">
 
@@ -71,10 +71,10 @@ export default function HomePage() {
           <Reveal delay={0.32}>
             <div className="mt-12 flex flex-wrap items-center gap-2">
               <span className="mr-1 text-xs font-500 uppercase tracking-widest text-muted-foreground">Модели:</span>
-              {CAR_MODELS.map((m) => (
-                <Link key={m} href={`/catalog`}>
+              {carModels.map((m) => (
+                <Link key={m.id} href={`/catalog?model=${m.slug}`}>
                   <span className="rounded-full border border-glass-border bg-surface/40 px-3 py-1.5 text-sm text-muted-foreground backdrop-blur-md transition-colors hover:border-accent/40 hover:text-foreground cursor-pointer">
-                    {m}
+                    {m.brand} {m.name}
                   </span>
                 </Link>
               ))}
@@ -110,7 +110,7 @@ export default function HomePage() {
           />
         </Reveal>
         <Reveal delay={0.1}>
-          <MaintenanceCenter />
+          <MaintenanceCenter models={maintModels} />
         </Reveal>
       </section>
 
