@@ -4,7 +4,6 @@ import { Reveal } from '@/components/shared/Reveal'
 import { MaintenanceCenter } from '@/components/calculator/MaintenanceCenter'
 import { MacroCompareSlider } from '@/components/blog/MacroCompareSlider'
 import { LeadForm } from '@/components/forms/LeadForm'
-import { DitheringShader } from '@/components/ui/dithering-shader'
 import { getMaintenanceModels, getCarModels } from '@/lib/queries'
 import {
   TEXTURE_ORIGINAL_FILTER, TEXTURE_FAKE_FILTER,
@@ -27,24 +26,6 @@ export default async function HomePage() {
       <section className="relative overflow-hidden">
         <div className="grid-backdrop absolute inset-0 -z-10 opacity-50" />
         <div className="absolute left-1/2 top-0 -z-10 h-[400px] w-[700px] -translate-x-1/2 rounded-full bg-accent/10 blur-[120px]" />
-
-        {/* Dithered logo background (right side, desktop) */}
-        <div className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[58%] md:block">
-          <DitheringShader
-            image="/images/logo.png"
-            shape="image"
-            type="8x8"
-            colorBack="#061521"
-            colorFront="#C49A45"
-            pxSize={2}
-            speed={1.1}
-            imageScale={0.7}
-            className="h-full w-full opacity-80"
-          />
-          {/* fade into page so hero text stays readable */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#061521] via-[#061521]/55 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#061521] via-transparent to-[#061521]/70" />
-        </div>
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 pb-16 md:pt-28">
           <Reveal>
