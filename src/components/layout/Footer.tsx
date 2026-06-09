@@ -6,11 +6,10 @@ import { usePathname } from 'next/navigation'
 import { MapPin, Phone, ExternalLink } from 'lucide-react'
 
 const CATALOG_LINKS = [
-  { href: '/catalog?model=geely-monjaro', label: 'Geely Monjaro' },
-  { href: '/catalog?model=geely-tugella', label: 'Geely Tugella' },
-  { href: '/catalog?model=geely-preface', label: 'Geely Preface' },
-  { href: '/catalog?model=li-auto-l7',    label: 'Li Auto L7' },
-  { href: '/catalog?model=li-auto-l9',    label: 'Li Auto L9' },
+  { href: '/catalog?model=geely-atlas',    label: 'Geely Atlas' },
+  { href: '/catalog?model=geely-monjaro',  label: 'Geely Monjaro' },
+  { href: '/catalog?model=geely-coolray',  label: 'Geely Coolray' },
+  { href: '/catalog?model=geely-okavango', label: 'Geely Okavango' },
 ]
 
 const INFO_LINKS = [
@@ -55,7 +54,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Премиальный хаб оригинальных запчастей для Geely и Li Auto.
+              Премиальный хаб оригинальных запчастей для Geely.
               Только проверенные детали с OEM-номерами.
             </p>
             <div className="mt-5 flex items-center gap-2">

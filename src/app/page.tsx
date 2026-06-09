@@ -9,7 +9,7 @@ import {
 } from '@/lib/textures'
 
 const CAR_MODELS = [
-  'Geely Monjaro', 'Geely Tugella', 'Geely Preface', 'Geely Coolray', 'Li Auto L7', 'Li Auto L9',
+  'Geely Atlas', 'Geely Monjaro', 'Geely Coolray', 'Geely Okavango',
 ]
 
 const FEATURES = [
@@ -39,7 +39,7 @@ export default function HomePage() {
             <h1 className="mt-6 max-w-4xl font-heading text-4xl font-700 leading-[1.05] tracking-tight md:text-6xl lg:text-7xl">
               Оригинальные запчасти для{' '}
               <span className="text-accent">Geely</span>{' '}
-              <span className="text-gradient">и Li Auto</span>
+              <span className="text-gradient">в Павлодаре</span>
             </h1>
           </Reveal>
 

@@ -16,12 +16,12 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Damu Auto — Оригинальные запчасти Geely и Li Auto · Павлодар',
+    default: 'Damu Auto — Оригинальные запчасти Geely · Павлодар',
     template: '%s | Damu Auto',
   },
   description:
-    'Премиальный хаб оригинальных запчастей для Geely и Li Auto. Интерактивный калькулятор ТО, макро-сравнение оригинала и подделки, каталог с OEM-номерами.',
-  keywords: ['Geely', 'Li Auto', 'запчасти', 'Павлодар', 'ТО', 'оригинал', 'Damu Auto'],
+    'Премиальный хаб оригинальных запчастей для Geely. Интерактивный калькулятор ТО, макро-сравнение оригинала и подделки, каталог с OEM-номерами.',
+  keywords: ['Geely', 'Atlas', 'Monjaro', 'Coolray', 'Okavango', 'запчасти', 'Павлодар', 'ТО', 'оригинал', 'Damu Auto'],
   openGraph: { type: 'website', locale: 'ru_RU', siteName: 'Damu Auto' },
 }
 

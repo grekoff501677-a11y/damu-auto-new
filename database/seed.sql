@@ -2,14 +2,12 @@
 -- DAMU AUTO — Seed Data
 -- ============================================================
 
--- Car Models
+-- Car Models (Geely-only lineup)
 INSERT INTO car_models (brand, name, slug, year_from, year_to, sort_order) VALUES
-  ('Geely', 'Monjaro',  'geely-monjaro',  2022, NULL, 1),
-  ('Geely', 'Tugella',  'geely-tugella',  2019, NULL, 2),
-  ('Geely', 'Preface',  'geely-preface',  2020, NULL, 3),
-  ('Geely', 'Coolray',  'geely-coolray',  2019, NULL, 4),
-  ('Li Auto', 'L7',     'li-auto-l7',     2023, NULL, 5),
-  ('Li Auto', 'L9',     'li-auto-l9',     2022, NULL, 6);
+  ('Geely', 'Atlas',    'geely-atlas',    2018, NULL, 1),
+  ('Geely', 'Monjaro',  'geely-monjaro',  2022, NULL, 2),
+  ('Geely', 'Coolray',  'geely-coolray',  2019, NULL, 3),
+  ('Geely', 'Okavango', 'geely-okavango', 2022, NULL, 4);
 
 -- Sample Product (Geely Original Oil 5W-30)
 INSERT INTO products (name, slug, short_desc, description, category, oem_number, kaspi_url, specifications, is_featured)
@@ -25,33 +23,27 @@ VALUES (
   TRUE
 );
 
--- Maintenance Rules for Geely Monjaro (example)
+-- Maintenance Rules for Geely Monjaro (example, 10 000 km base intervals)
 INSERT INTO maintenance_rules (car_model_id, product_name, rule_type, interval_km, interval_months, spec_hint, sort_order)
-SELECT
-  id,
-  'Моторное масло',     'replace', 5000,  6,  '5W-30, 4L', 1
-FROM car_models WHERE slug = 'geely-monjaro';
+SELECT id, 'Моторное масло',     'replace', 10000,  6, '5W-30, 4L',          1 FROM car_models WHERE slug = 'geely-monjaro';
 
 INSERT INTO maintenance_rules (car_model_id, product_name, rule_type, interval_km, interval_months, spec_hint, sort_order)
-SELECT
-  id,
-  'Воздушный фильтр',   'replace', 15000, 12, 'Оригинальный', 2
-FROM car_models WHERE slug = 'geely-monjaro';
+SELECT id, 'Масляный фильтр',    'replace', 10000,  6, 'Original',           2 FROM car_models WHERE slug = 'geely-monjaro';
 
 INSERT INTO maintenance_rules (car_model_id, product_name, rule_type, interval_km, interval_months, spec_hint, sort_order)
-SELECT
-  id,
-  'Салонный фильтр',    'replace', 10000, 12, 'Оригинальный', 3
-FROM car_models WHERE slug = 'geely-monjaro';
+SELECT id, 'Воздушный фильтр',   'replace', 20000, 12, 'Original бумажный',  3 FROM car_models WHERE slug = 'geely-monjaro';
 
 INSERT INTO maintenance_rules (car_model_id, product_name, rule_type, interval_km, interval_months, spec_hint, sort_order)
-SELECT
-  id,
-  'Антифриз LEC II',    'inspect', 30000, 24, 'Концентрат, синий', 4
-FROM car_models WHERE slug = 'geely-monjaro';
+SELECT id, 'Салонный фильтр',    'replace', 20000, 12, 'Угольный PM2.5',     4 FROM car_models WHERE slug = 'geely-monjaro';
 
 INSERT INTO maintenance_rules (car_model_id, product_name, rule_type, interval_km, interval_months, spec_hint, sort_order)
-SELECT
-  id,
-  'Тормозная жидкость', 'inspect', 40000, 24, 'DOT 4', 5
-FROM car_models WHERE slug = 'geely-monjaro';
+SELECT id, 'Антифриз LEC II',    'inspect', 30000, 18, 'Концентрат, синий',  5 FROM car_models WHERE slug = 'geely-monjaro';
+
+INSERT INTO maintenance_rules (car_model_id, product_name, rule_type, interval_km, interval_months, spec_hint, sort_order)
+SELECT id, 'Тормозная жидкость', 'replace', 50000, 30, 'DOT 4',              6 FROM car_models WHERE slug = 'geely-monjaro';
+
+INSERT INTO maintenance_rules (car_model_id, product_name, rule_type, interval_km, interval_months, spec_hint, sort_order)
+SELECT id, 'Свечи зажигания',    'replace', 60000, 36, 'Iridium, зазор 0.9', 7 FROM car_models WHERE slug = 'geely-monjaro';
+
+INSERT INTO maintenance_rules (car_model_id, product_name, rule_type, interval_km, interval_months, spec_hint, sort_order)
+SELECT id, 'Масло АКПП / DCT',   'replace', 60000, 36, 'DCT Fluid, 6 л',     8 FROM car_models WHERE slug = 'geely-monjaro';

@@ -10,8 +10,8 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 -- ============================================================
 CREATE TABLE car_models (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  brand       TEXT NOT NULL,                        -- 'Geely' | 'Li Auto'
-  name        TEXT NOT NULL,                        -- 'Monjaro' | 'L7'
+  brand       TEXT NOT NULL,                        -- 'Geely'
+  name        TEXT NOT NULL,                        -- 'Atlas' | 'Monjaro' | 'Coolray' | 'Okavango'
   full_name   TEXT GENERATED ALWAYS AS (brand || ' ' || name) STORED,
   slug        TEXT UNIQUE NOT NULL,                 -- 'geely-monjaro'
   year_from   SMALLINT,

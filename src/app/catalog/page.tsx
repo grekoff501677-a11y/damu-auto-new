@@ -8,7 +8,7 @@ export default function CatalogPage() {
       <p className="text-xs font-600 uppercase tracking-widest text-accent">Каталог</p>
       <h1 className="mt-2 font-heading text-4xl font-700 tracking-tight">Запчасти и аксессуары</h1>
       <p className="mt-3 max-w-xl text-muted-foreground leading-relaxed">
-        Оригинальные детали для Geely и Li Auto. Нажмите на карточку — описание,
+        Оригинальные детали для Geely. Нажмите на карточку — описание,
         совместимость и кнопка Kaspi откроются прямо здесь.
       </p>
       <div className="mt-10">
