@@ -56,10 +56,18 @@ export function MaintenanceCenter({ models }: { models: PublicMaintModel[] }) {
         <div className="relative overflow-hidden border-b border-glass-border lg:border-b-0 lg:border-r">
           {/* fog fills the entire panel */}
           {model?.blueprint?.image && <FogBackground className="absolute inset-0" />}
-          <div className="grid-backdrop absolute inset-0 opacity-40" />
+          {/* faint cool blueprint grid over the fog (fades at edges) */}
+          <div className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(125,165,205,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(125,165,205,0.07) 1px, transparent 1px)',
+              backgroundSize: '34px 34px',
+              maskImage: 'radial-gradient(ellipse 85% 85% at 50% 50%, #000 55%, transparent 100%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 85% 85% at 50% 50%, #000 55%, transparent 100%)',
+            }} />
           {/* edge vignette so the car reads against the fog */}
           <div className="pointer-events-none absolute inset-0"
-            style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 52%, transparent 40%, rgba(6,21,33,0.55) 100%)' }} />
+            style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 52%, transparent 40%, rgba(6,21,33,0.5) 100%)' }} />
           <div className="relative flex h-full min-h-[300px] items-center justify-center p-4 sm:p-6">
             <VehicleBlueprint active={activeNodes} blueprint={model?.blueprint} className="w-full max-w-xl" />
           </div>

@@ -64,10 +64,11 @@ void main() {
   );
   float f = fbm(uv + r);
 
-  // dense mist — less squaring keeps mid-tones, brighter contrast
-  float d = clamp(pow(f, 1.1) * 1.7, 0.0, 1.0);
+  // denser mist — higher gain + contrast so swirls read clearly on dark navy
+  float d = clamp(pow(f, 0.92) * 2.0, 0.0, 1.0);
+  d = smoothstep(0.05, 0.95, d);             // punch up contrast
   vec3 color = mix(u_base, u_mist, d);
-  color = mix(color, u_accent, clamp(dot(q, r) * 0.55, 0.0, 1.0));
+  color = mix(color, u_accent, clamp(dot(q, r) * 0.6, 0.0, 1.0));
 
   // ── light source breaking through the fog (upper-centre) ──
   vec2 lp = vec2(0.5 * aspect, 0.74);
@@ -84,9 +85,9 @@ void main() {
 `
 
 // stable module-level defaults so the effect doesn't recreate the GL context each render
-const DEFAULT_BASE: RGB = [0.016, 0.055, 0.090]   // deep navy
-const DEFAULT_MIST: RGB = [0.065, 0.145, 0.215]   // darker cool navy swirls
-const DEFAULT_ACCENT: RGB = [0.11, 0.20, 0.30]    // muted cool steel-blue
+const DEFAULT_BASE: RGB = [0.013, 0.048, 0.080]   // deep navy (kept dark for contrast)
+const DEFAULT_MIST: RGB = [0.085, 0.185, 0.265]   // brighter cool navy swirls (~+12%)
+const DEFAULT_ACCENT: RGB = [0.13, 0.23, 0.34]    // cool steel-blue
 
 export function FogBackground({
   className = "absolute inset-0",
