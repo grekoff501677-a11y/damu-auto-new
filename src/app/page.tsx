@@ -30,7 +30,7 @@ export default async function HomePage() {
 
         {/* gradient-traced logo on the right (desktop) */}
         <div className="pointer-events-none absolute inset-y-0 right-2 z-0 hidden items-center justify-center md:flex lg:right-12">
-          <HeroLogo className="w-[clamp(320px,34vw,520px)]" />
+          <HeroLogo className="w-[clamp(300px,30vw,440px)]" />
         </div>
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-12 md:pt-28 md:pb-16">
