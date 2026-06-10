@@ -53,8 +53,9 @@ float fbm(vec2 p) {
 }
 
 void main() {
-  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-  uv.x *= u_resolution.x / u_resolution.y;
+  float aspect = u_resolution.x / u_resolution.y;
+  vec2 uvr = gl_FragCoord.xy / u_resolution.xy;
+  vec2 uv = uvr; uv.x *= aspect;
 
   vec2 q = vec2(fbm(uv + 0.07 * u_time), fbm(uv + vec2(1.0)));
   vec2 r = vec2(
@@ -63,24 +64,30 @@ void main() {
   );
   float f = fbm(uv + r);
 
-  // +30% denser mist
-  float d = clamp(f * f * 1.3, 0.0, 1.0);
+  // dense mist — less squaring keeps mid-tones, brighter contrast
+  float d = clamp(pow(f, 1.1) * 1.7, 0.0, 1.0);
   vec3 color = mix(u_base, u_mist, d);
-  color = mix(color, u_accent, clamp(dot(q, r) * 0.45, 0.0, 1.0));
+  color = mix(color, u_accent, clamp(dot(q, r) * 0.55, 0.0, 1.0));
 
-  // gentle center lift so the subject reads
-  vec2 c = gl_FragCoord.xy / u_resolution.xy - 0.5;
-  float vign = smoothstep(0.85, 0.15, length(c));
-  color += vign * 0.025 * u_accent;
+  // ── light source breaking through the fog (upper-centre) ──
+  vec2 lp = vec2(0.5 * aspect, 0.74);
+  float ld = distance(uv, lp);
+  float light = smoothstep(0.95, 0.0, ld);
+  vec3 lightCol = vec3(0.62, 0.50, 0.30);          // warm gold beam
+  color += light * (0.14 + 0.40 * f) * lightCol;   // volumetric: brighter where mist is thick
 
+  // gentle center lift
+  color += smoothstep(0.9, 0.1, length(uvr - 0.5)) * 0.03 * u_accent;
+
+  color *= 1.12;
   gl_FragColor = vec4(color, 1.0);
 }
 `
 
 // stable module-level defaults so the effect doesn't recreate the GL context each render
-const DEFAULT_BASE: RGB = [0.022, 0.078, 0.122]   // #061521
-const DEFAULT_MIST: RGB = [0.063, 0.16, 0.235]    // lighter navy
-const DEFAULT_ACCENT: RGB = [0.34, 0.27, 0.13]    // dim gold
+const DEFAULT_BASE: RGB = [0.024, 0.082, 0.130]   // #061521
+const DEFAULT_MIST: RGB = [0.11, 0.22, 0.31]      // clearly lighter navy → visible swirls
+const DEFAULT_ACCENT: RGB = [0.40, 0.31, 0.15]    // gold
 
 export function FogBackground({
   className = "absolute inset-0",

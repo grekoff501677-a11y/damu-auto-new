@@ -65,21 +65,22 @@ export function VehicleBlueprint({ active, className, blueprint }: Props) {
           // hollow contour ring — fill stays transparent; only the outline glows when active
           const ring = on ? '#9FE0FF' : decorative ? 'rgba(196,154,69,0.8)' : 'rgba(214,232,250,0.45)'
           return (
-            <div key={h.id} className="absolute inset-0">
-              {/* dot (interactive for hover halo) */}
+            // full-size layer must NOT capture pointer events, else stacked layers block hover
+            <div key={h.id} className="pointer-events-none absolute inset-0">
+              {/* dot — 36px transparent hit area so hover/touch is easy */}
               <div
-                className="group pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2"
+                className="group pointer-events-auto absolute flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center"
                 style={{ left: `${h.x}%`, top: `${h.y}%` }}
               >
-                {/* hover halo — light glow on cursor/finger */}
+                {/* hover/touch halo — light glow around cursor */}
                 <span
-                  className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-active:opacity-100"
-                  style={{ width: 40, height: 40, background: 'radial-gradient(circle, rgba(56,189,248,0.35), transparent 70%)' }}
+                  className="pointer-events-none absolute rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-active:opacity-100"
+                  style={{ width: 44, height: 44, background: 'radial-gradient(circle, rgba(56,189,248,0.40), transparent 70%)' }}
                 />
                 {/* active pulse */}
                 {on && (
                   <motion.span
-                    className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                    className="pointer-events-none absolute rounded-full"
                     style={{ width: 26, height: 26, border: '1.5px solid rgba(56,189,248,0.6)' }}
                     animate={{ scale: [1, 1.8, 1], opacity: [0.7, 0, 0.7] }}
                     transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
@@ -87,7 +88,7 @@ export function VehicleBlueprint({ active, className, blueprint }: Props) {
                 )}
                 {/* contour ring */}
                 <span
-                  className="relative block rounded-full transition-all duration-300"
+                  className="relative block rounded-full transition-all duration-300 group-hover:scale-110"
                   style={{
                     width: 14, height: 14,
                     border: `2px solid ${ring}`,
