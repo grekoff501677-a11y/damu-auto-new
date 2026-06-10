@@ -27,7 +27,7 @@ export default async function HomePage() {
         <div className="grid-backdrop absolute inset-0 -z-10 opacity-50" />
         <div className="absolute left-1/2 top-0 -z-10 h-[400px] w-[700px] -translate-x-1/2 rounded-full bg-accent/10 blur-[120px]" />
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 pb-16 md:pt-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 pb-12 md:pt-28 md:pb-16">
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-glass-border bg-surface/60 px-3 py-1 text-xs font-500 text-muted-foreground backdrop-blur-md">
               <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgba(196,154,69,0.6)]" />
@@ -101,7 +101,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── MAINTENANCE CENTER ── */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         <Reveal>
           <SectionHead
             kicker="Инструмент №1"
@@ -116,7 +116,7 @@ export default async function HomePage() {
 
       {/* ── ORIGINALITY HUB ── */}
       <section className="border-y border-glass-border bg-surface/30">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 md:py-16">
           <Reveal>
             <SectionHead
               kicker="Наша миссия"
@@ -147,7 +147,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── LEAD FORM ── */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
           <Reveal>
             <SectionHead
