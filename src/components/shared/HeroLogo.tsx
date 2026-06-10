@@ -21,7 +21,7 @@ const RING = 'radial-gradient(circle closest-side, transparent 0 88%, #000 90%, 
 // soft moving spotlight that REVEALS the natural logo (no colour overlay).
 // Compact patch co-located with the comet head so the rest stays clearly in shadow.
 const SPOTLIGHT =
-  'radial-gradient(circle at 50% 9%, #000 0%, rgba(0,0,0,0.85) 15%, rgba(0,0,0,0.4) 28%, transparent 44%)'
+  'radial-gradient(circle at 50% 9%, #000 0%, #000 20%, rgba(0,0,0,0.6) 34%, transparent 50%)'
 
 const SPIN = { duration: 7, repeat: Infinity, ease: 'linear' as const }
 const CCW = { rotate: -360 } // head leads
@@ -50,7 +50,7 @@ export function HeroLogo({ className }: { className?: string }) {
         <motion.img
           src={LOGO} alt="" aria-hidden loading="lazy" decoding="async"
           className={LOGO_BOX}
-          style={{ filter: 'brightness(1.05)' }}
+          style={{ filter: 'brightness(1.45) saturate(1.05) drop-shadow(0 0 10px rgba(251,232,196,0.45))' }}
           animate={CW} transition={SPIN}
         />
       </motion.div>
