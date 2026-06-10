@@ -73,21 +73,20 @@ void main() {
   vec2 lp = vec2(0.5 * aspect, 0.74);
   float ld = distance(uv, lp);
   float light = smoothstep(0.95, 0.0, ld);
-  vec3 lightCol = vec3(0.40, 0.54, 0.70);          // cool steel-blue beam
-  color += light * (0.14 + 0.40 * f) * lightCol;   // volumetric: brighter where mist is thick
+  vec3 lightCol = vec3(0.34, 0.46, 0.60);          // cool steel-blue beam (dimmer)
+  color += light * (0.10 + 0.30 * f) * lightCol;   // volumetric: brighter where mist is thick
 
   // gentle center lift
-  color += smoothstep(0.9, 0.1, length(uvr - 0.5)) * 0.03 * u_accent;
+  color += smoothstep(0.9, 0.1, length(uvr - 0.5)) * 0.025 * u_accent;
 
-  color *= 1.12;
   gl_FragColor = vec4(color, 1.0);
 }
 `
 
 // stable module-level defaults so the effect doesn't recreate the GL context each render
-const DEFAULT_BASE: RGB = [0.024, 0.082, 0.130]   // #061521
-const DEFAULT_MIST: RGB = [0.10, 0.21, 0.30]      // cool lighter navy → visible swirls
-const DEFAULT_ACCENT: RGB = [0.16, 0.27, 0.38]    // cool steel-blue (was warm gold)
+const DEFAULT_BASE: RGB = [0.016, 0.055, 0.090]   // deep navy
+const DEFAULT_MIST: RGB = [0.065, 0.145, 0.215]   // darker cool navy swirls
+const DEFAULT_ACCENT: RGB = [0.11, 0.20, 0.30]    // muted cool steel-blue
 
 export function FogBackground({
   className = "absolute inset-0",

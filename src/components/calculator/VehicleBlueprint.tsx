@@ -2,7 +2,6 @@
 
 import { motion } from 'motion/react'
 import { cn } from '@/lib/utils'
-import { FogBackground } from '@/components/ui/realistic-fog-background'
 import type { BlueprintHotspot } from '@/lib/types'
 
 export type BodyNode = 'engine' | 'cabin' | 'brakes' | 'transmission' | 'cooling'
@@ -29,15 +28,7 @@ export function VehicleBlueprint({ active, className, blueprint }: Props) {
     const hotspots = blueprint.hotspots ?? []
     const lines = hotspots.filter((h) => h.line)
     return (
-      <div className={cn('relative overflow-hidden rounded-2xl', className)}>
-        {/* animated mist behind the car (replaces static glow so node glows read clearly) */}
-        <FogBackground className="pointer-events-none absolute inset-0" />
-        {/* faint central lift */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{ background: 'radial-gradient(ellipse 58% 44% at 50% 56%, rgba(196,154,69,0.10), transparent 70%)' }}
-        />
+      <div className={cn('relative', className)}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={blueprint.image} alt="Схема автомобиля" loading="lazy" decoding="async" className="relative block h-auto w-full" />
 
