@@ -18,9 +18,10 @@ const COMET =
 
 const RING = 'radial-gradient(circle closest-side, transparent 0 88%, #000 90%, #000 92.5%, transparent 95%)'
 
-// soft moving spotlight that REVEALS the natural logo (no colour overlay)
+// soft moving spotlight that REVEALS the natural logo (no colour overlay).
+// Compact patch co-located with the comet head so the rest stays clearly in shadow.
 const SPOTLIGHT =
-  'radial-gradient(farthest-side at 50% 8%, #000 0%, rgba(0,0,0,0.85) 32%, rgba(0,0,0,0.4) 58%, transparent 88%)'
+  'radial-gradient(circle at 50% 9%, #000 0%, rgba(0,0,0,0.85) 15%, rgba(0,0,0,0.4) 28%, transparent 44%)'
 
 const SPIN = { duration: 7, repeat: Infinity, ease: 'linear' as const }
 const CCW = { rotate: -360 } // head leads
@@ -35,7 +36,7 @@ export function HeroLogo({ className }: { className?: string }) {
       <img
         src={LOGO} alt="Damu Auto" loading="lazy" decoding="async"
         className={LOGO_BOX}
-        style={{ filter: 'brightness(0.5) saturate(0.85)' }}
+        style={{ filter: 'brightness(0.32) saturate(0.7)' }}
       />
 
       {/* natural logo, revealed only inside the orbiting spotlight — the light
@@ -60,10 +61,16 @@ export function HeroLogo({ className }: { className?: string }) {
         style={{ background: 'rgba(196,154,69,0.10)', WebkitMaskImage: RING, maskImage: RING }}
       />
 
-      {/* comet soft glow trail (a touch more golden) */}
+      {/* comet wide soft halo — makes the directional light obviously the comet */}
       <motion.div
         aria-hidden className="absolute inset-0 rounded-full"
-        style={{ background: COMET, WebkitMaskImage: RING, maskImage: RING, filter: 'blur(4px)', opacity: 0.85 }}
+        style={{ background: COMET, WebkitMaskImage: RING, maskImage: RING, filter: 'blur(9px)', opacity: 0.95 }}
+        animate={CCW} transition={SPIN}
+      />
+      {/* comet soft glow trail */}
+      <motion.div
+        aria-hidden className="absolute inset-0 rounded-full"
+        style={{ background: COMET, WebkitMaskImage: RING, maskImage: RING, filter: 'blur(3px)', opacity: 0.95 }}
         animate={CCW} transition={SPIN}
       />
       {/* comet crisp line */}
