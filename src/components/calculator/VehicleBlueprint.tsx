@@ -1,8 +1,18 @@
 'use client'
 
-import { motion } from 'motion/react'
+import { motion, AnimatePresence } from 'motion/react'
+import { cn } from '@/lib/utils'
+import type { BlueprintConfig } from '@/lib/vehicle-blueprints'
 
 export type BodyNode = 'engine' | 'cabin' | 'brakes' | 'transmission' | 'cooling'
+
+const NODE_LABELS: Record<BodyNode, string> = {
+  engine: 'Двигатель',
+  cooling: 'Охлаждение',
+  cabin: 'Салон',
+  transmission: 'Трансмиссия',
+  brakes: 'Тормоза / подвеска',
+}
 
 const NODES: Record<BodyNode, { x: number; y: number; label: string }> = {
   engine:       { x: 88,  y: 116, label: 'Двигатель' },
@@ -15,9 +25,51 @@ const NODES: Record<BodyNode, { x: number; y: number; label: string }> = {
 type Props = {
   active: BodyNode[]
   className?: string
+  /** when provided, renders the AI wireframe image with glowing hotspots */
+  blueprint?: BlueprintConfig
 }
 
-export function VehicleBlueprint({ active, className }: Props) {
+export function VehicleBlueprint({ active, className, blueprint }: Props) {
+  // ── Image mode: AI-generated wireframe render + glowing hotspot overlay ──
+  if (blueprint?.image) {
+    const entries = Object.entries(blueprint.nodes) as [BodyNode, { x: number; y: number }][]
+    return (
+      <div className={cn('relative', className)}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={blueprint.image} alt="Схема автомобиля" className="h-full w-full object-contain" />
+        {entries.map(([node, pos]) => {
+          const on = active.includes(node)
+          return (
+            <div key={node} className="absolute -translate-x-1/2 -translate-y-1/2"
+              style={{ left: `${pos.x}%`, top: `${pos.y}%` }}>
+              {on && (
+                <motion.span
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/30"
+                  style={{ width: 34, height: 34 }}
+                  animate={{ scale: [1, 1.6, 1], opacity: [0.5, 0, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              )}
+              <span className={cn('relative block rounded-full transition-all duration-300',
+                on ? 'h-3 w-3 bg-accent shadow-[0_0_16px_4px_rgba(196,154,69,0.85)]'
+                   : 'h-2 w-2 bg-white/25')} />
+              <AnimatePresence>
+                {on && (
+                  <motion.span
+                    initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                    className="absolute left-1/2 top-3 -translate-x-1/2 whitespace-nowrap rounded-md border border-accent/30 bg-black/60 px-1.5 py-0.5 text-[9px] font-600 text-accent backdrop-blur-sm">
+                    {NODE_LABELS[node]}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
+  // ── Fallback: schematic SVG silhouette ──
   return (
     <div className={className}>
       <svg viewBox="0 0 400 220" fill="none" className="h-full w-full">
