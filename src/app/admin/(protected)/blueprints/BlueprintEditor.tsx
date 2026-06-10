@@ -141,8 +141,8 @@ export function BlueprintEditor({
                 >
                   <span className="block rounded-full" style={
                     on
-                      ? { width: 14, height: 14, background: '#EAF6FF', boxShadow: '0 0 0 2px #061521, 0 0 14px 4px rgba(56,189,248,0.9)' }
-                      : { width: 12, height: 12, background: '#C49A45', boxShadow: '0 0 0 2px #061521' }
+                      ? { width: 14, height: 14, border: '2px solid #9FE0FF', background: 'rgba(56,189,248,0.12)', boxShadow: '0 0 0 1px rgba(6,21,33,0.9), 0 0 14px 3px rgba(56,189,248,0.7)' }
+                      : { width: 14, height: 14, border: `2px solid ${h.bodyNode ? 'rgba(214,232,250,0.5)' : 'rgba(196,154,69,0.8)'}`, background: 'transparent', boxShadow: '0 0 0 1px rgba(6,21,33,0.7)' }
                   } />
                   {isSel && <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-sky-300" style={{ width: 26, height: 26 }} />}
                 </button>

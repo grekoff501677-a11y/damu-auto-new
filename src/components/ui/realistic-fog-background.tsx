@@ -63,8 +63,10 @@ void main() {
   );
   float f = fbm(uv + r);
 
-  vec3 color = mix(u_base, u_mist, clamp(f * f, 0.0, 1.0));
-  color = mix(color, u_accent, clamp(dot(q, r) * 0.35, 0.0, 1.0));
+  // +30% denser mist
+  float d = clamp(f * f * 1.3, 0.0, 1.0);
+  vec3 color = mix(u_base, u_mist, d);
+  color = mix(color, u_accent, clamp(dot(q, r) * 0.45, 0.0, 1.0));
 
   // gentle center lift so the subject reads
   vec2 c = gl_FragCoord.xy / u_resolution.xy - 0.5;

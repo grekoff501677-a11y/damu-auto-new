@@ -31,7 +31,7 @@ export function VehicleBlueprint({ active, className, blueprint }: Props) {
     return (
       <div className={cn('relative overflow-hidden rounded-2xl', className)}>
         {/* animated mist behind the car (replaces static glow so node glows read clearly) */}
-        <FogBackground className="pointer-events-none absolute inset-0 opacity-80" />
+        <FogBackground className="pointer-events-none absolute inset-0" />
         {/* faint central lift */}
         <div
           aria-hidden
@@ -62,37 +62,50 @@ export function VehicleBlueprint({ active, className, blueprint }: Props) {
           const labelAtLine = !!h.line
           const lx = labelAtLine ? h.line!.x2 : h.x
           const ly = labelAtLine ? h.line!.y2 : h.y
+          // hollow contour ring — fill stays transparent; only the outline glows when active
+          const ring = on ? '#9FE0FF' : decorative ? 'rgba(196,154,69,0.8)' : 'rgba(214,232,250,0.45)'
           return (
-            <div key={h.id} className="pointer-events-none absolute inset-0">
-              {/* dot */}
-              <div className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${h.x}%`, top: `${h.y}%` }}>
+            <div key={h.id} className="absolute inset-0">
+              {/* dot (interactive for hover halo) */}
+              <div
+                className="group pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2"
+                style={{ left: `${h.x}%`, top: `${h.y}%` }}
+              >
+                {/* hover halo — light glow on cursor/finger */}
+                <span
+                  className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-active:opacity-100"
+                  style={{ width: 40, height: 40, background: 'radial-gradient(circle, rgba(56,189,248,0.35), transparent 70%)' }}
+                />
+                {/* active pulse */}
                 {on && (
                   <motion.span
-                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-                    style={{ width: 30, height: 30, background: 'rgba(56,189,248,0.35)' }}
-                    animate={{ scale: [1, 1.7, 1], opacity: [0.6, 0, 0.6] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                    className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                    style={{ width: 26, height: 26, border: '1.5px solid rgba(56,189,248,0.6)' }}
+                    animate={{ scale: [1, 1.8, 1], opacity: [0.7, 0, 0.7] }}
+                    transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
                   />
                 )}
+                {/* contour ring */}
                 <span
                   className="relative block rounded-full transition-all duration-300"
-                  style={
-                    on
-                      ? { width: 13, height: 13, background: '#EAF6FF', boxShadow: '0 0 0 2px #061521, 0 0 16px 5px rgba(56,189,248,0.9)' }
-                      : decorative
-                        ? { width: 9, height: 9, background: '#C49A45', boxShadow: '0 0 0 2px #061521, 0 0 8px 2px rgba(196,154,69,0.6)' }
-                        : { width: 9, height: 9, background: 'rgba(234,246,255,0.55)', boxShadow: '0 0 0 2px #061521' }
-                  }
+                  style={{
+                    width: 14, height: 14,
+                    border: `2px solid ${ring}`,
+                    background: on ? 'rgba(56,189,248,0.12)' : 'transparent',
+                    boxShadow: on
+                      ? '0 0 0 1px rgba(6,21,33,0.9), 0 0 14px 3px rgba(56,189,248,0.7)'
+                      : '0 0 0 1px rgba(6,21,33,0.7)',
+                  }}
                 />
               </div>
 
               {/* label */}
-              {h.label && (h.label.length > 0) && (on || decorative || labelAtLine) && (
+              {h.label && h.label.length > 0 && (on || decorative || labelAtLine) && (
                 <span
                   className={cn(
-                    'absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-md border px-1.5 py-0.5 text-[9px] font-600 backdrop-blur-sm',
+                    'pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-md border px-1.5 py-0.5 text-[9px] font-600 backdrop-blur-sm transition-colors',
                     on ? 'border-sky-300/40 bg-black/70 text-sky-100'
-                       : 'border-accent/30 bg-black/60 text-accent'
+                       : 'border-accent/30 bg-black/55 text-accent/90'
                   )}
                   style={{ left: `${lx}%`, top: `calc(${ly}% - 14px)` }}
                 >
