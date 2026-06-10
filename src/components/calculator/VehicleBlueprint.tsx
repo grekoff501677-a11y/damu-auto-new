@@ -1,18 +1,13 @@
 'use client'
 
-import { motion, AnimatePresence } from 'motion/react'
+import { motion } from 'motion/react'
 import { cn } from '@/lib/utils'
-import type { BlueprintConfig } from '@/lib/vehicle-blueprints'
+import { FogBackground } from '@/components/ui/realistic-fog-background'
+import type { BlueprintHotspot } from '@/lib/types'
 
 export type BodyNode = 'engine' | 'cabin' | 'brakes' | 'transmission' | 'cooling'
 
-const NODE_LABELS: Record<BodyNode, string> = {
-  engine: 'Двигатель',
-  cooling: 'Охлаждение',
-  cabin: 'Салон',
-  transmission: 'Трансмиссия',
-  brakes: 'Тормоза / подвеска',
-}
+export type BlueprintData = { image: string; hotspots: BlueprintHotspot[] }
 
 const NODES: Record<BodyNode, { x: number; y: number; label: string }> = {
   engine:       { x: 88,  y: 116, label: 'Двигатель' },
@@ -25,43 +20,85 @@ const NODES: Record<BodyNode, { x: number; y: number; label: string }> = {
 type Props = {
   active: BodyNode[]
   className?: string
-  /** when provided, renders the AI wireframe image with glowing hotspots */
-  blueprint?: BlueprintConfig
+  blueprint?: BlueprintData
 }
 
 export function VehicleBlueprint({ active, className, blueprint }: Props) {
-  // ── Image mode: AI-generated wireframe render + glowing hotspot overlay ──
+  // ── Image mode: AI wireframe render + glowing hotspot overlay ──
   if (blueprint?.image) {
-    const entries = Object.entries(blueprint.nodes) as [BodyNode, { x: number; y: number }][]
+    const hotspots = blueprint.hotspots ?? []
+    const lines = hotspots.filter((h) => h.line)
     return (
-      <div className={cn('relative', className)}>
+      <div className={cn('relative overflow-hidden rounded-2xl', className)}>
+        {/* animated mist behind the car (replaces static glow so node glows read clearly) */}
+        <FogBackground className="pointer-events-none absolute inset-0 opacity-80" />
+        {/* faint central lift */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{ background: 'radial-gradient(ellipse 58% 44% at 50% 56%, rgba(196,154,69,0.10), transparent 70%)' }}
+        />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={blueprint.image} alt="Схема автомобиля" loading="lazy" decoding="async" className="h-full w-full object-contain" />
-        {entries.map(([node, pos]) => {
-          const on = active.includes(node)
+        <img src={blueprint.image} alt="Схема автомобиля" loading="lazy" decoding="async" className="relative block h-auto w-full" />
+
+        {/* leader lines */}
+        {lines.length > 0 && (
+          <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            {lines.map((h) => {
+              const on = !!h.bodyNode && active.includes(h.bodyNode)
+              return (
+                <line key={h.id} x1={h.x} y1={h.y} x2={h.line!.x2} y2={h.line!.y2}
+                  stroke={on ? '#EAF6FF' : 'rgba(196,154,69,0.55)'} strokeWidth={1}
+                  vectorEffect="non-scaling-stroke" strokeLinecap="round" />
+              )
+            })}
+          </svg>
+        )}
+
+        {/* hotspots */}
+        {hotspots.map((h) => {
+          const decorative = !h.bodyNode
+          const on = !!h.bodyNode && active.includes(h.bodyNode)
+          const labelAtLine = !!h.line
+          const lx = labelAtLine ? h.line!.x2 : h.x
+          const ly = labelAtLine ? h.line!.y2 : h.y
           return (
-            <div key={node} className="absolute -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${pos.x}%`, top: `${pos.y}%` }}>
-              {on && (
-                <motion.span
-                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/30"
-                  style={{ width: 34, height: 34 }}
-                  animate={{ scale: [1, 1.6, 1], opacity: [0.5, 0, 0.5] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                />
-              )}
-              <span className={cn('relative block rounded-full transition-all duration-300',
-                on ? 'h-3 w-3 bg-accent shadow-[0_0_16px_4px_rgba(196,154,69,0.85)]'
-                   : 'h-2 w-2 bg-white/25')} />
-              <AnimatePresence>
+            <div key={h.id} className="pointer-events-none absolute inset-0">
+              {/* dot */}
+              <div className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${h.x}%`, top: `${h.y}%` }}>
                 {on && (
                   <motion.span
-                    initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                    className="absolute left-1/2 top-3 -translate-x-1/2 whitespace-nowrap rounded-md border border-accent/30 bg-black/60 px-1.5 py-0.5 text-[9px] font-600 text-accent backdrop-blur-sm">
-                    {NODE_LABELS[node]}
-                  </motion.span>
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                    style={{ width: 30, height: 30, background: 'rgba(56,189,248,0.35)' }}
+                    animate={{ scale: [1, 1.7, 1], opacity: [0.6, 0, 0.6] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  />
                 )}
-              </AnimatePresence>
+                <span
+                  className="relative block rounded-full transition-all duration-300"
+                  style={
+                    on
+                      ? { width: 13, height: 13, background: '#EAF6FF', boxShadow: '0 0 0 2px #061521, 0 0 16px 5px rgba(56,189,248,0.9)' }
+                      : decorative
+                        ? { width: 9, height: 9, background: '#C49A45', boxShadow: '0 0 0 2px #061521, 0 0 8px 2px rgba(196,154,69,0.6)' }
+                        : { width: 9, height: 9, background: 'rgba(234,246,255,0.55)', boxShadow: '0 0 0 2px #061521' }
+                  }
+                />
+              </div>
+
+              {/* label */}
+              {h.label && (h.label.length > 0) && (on || decorative || labelAtLine) && (
+                <span
+                  className={cn(
+                    'absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-md border px-1.5 py-0.5 text-[9px] font-600 backdrop-blur-sm',
+                    on ? 'border-sky-300/40 bg-black/70 text-sky-100'
+                       : 'border-accent/30 bg-black/60 text-accent'
+                  )}
+                  style={{ left: `${lx}%`, top: `calc(${ly}% - 14px)` }}
+                >
+                  {h.label}
+                </span>
+              )}
             </div>
           )
         })}
@@ -87,83 +124,47 @@ export function VehicleBlueprint({ active, className, blueprint }: Props) {
           </filter>
         </defs>
 
-        {/* ground reflection line */}
         <line x1="20" y1="196" x2="380" y2="196" stroke="rgba(255,255,255,0.08)" strokeWidth="1" strokeDasharray="2 6" />
 
-        {/* ── SUV side silhouette ── */}
         <motion.path
-          d="M30 168
-             C30 150 34 140 52 136
-             C60 122 74 116 92 114
-             L120 90
-             C128 78 140 72 158 71
-             L250 69
-             C272 69 288 78 300 96
-             L356 104
-             C372 107 378 118 378 134
-             L378 168"
-          stroke="url(#bp-stroke)"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ duration: 1.4, ease: 'easeInOut' }}
-        />
-        {/* beltline + windows */}
+          d="M30 168 C30 150 34 140 52 136 C60 122 74 116 92 114 L120 90 C128 78 140 72 158 71 L250 69 C272 69 288 78 300 96 L356 104 C372 107 378 118 378 134 L378 168"
+          stroke="url(#bp-stroke)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"
+          initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 1.4, ease: 'easeInOut' }} />
         <motion.path
           d="M124 112 L292 110 M132 90 L186 88 L188 110 M196 88 L256 87 L258 110"
           stroke="rgba(255,255,255,0.18)" strokeWidth="1" strokeLinecap="round"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1, duration: 0.8 }}
-        />
-        {/* door split */}
-        <motion.line x1="216" y1="110" x2="216" y2="160"
-          stroke="rgba(255,255,255,0.10)" strokeWidth="1"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1, duration: 0.8 }} />
+        <motion.line x1="216" y1="110" x2="216" y2="160" stroke="rgba(255,255,255,0.10)" strokeWidth="1"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2, duration: 0.6 }} />
 
-        {/* wheels */}
         {[120, 312].map((cx, i) => (
           <motion.g key={cx}
             initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.8 + i * 0.15, type: 'spring', stiffness: 120, damping: 14 }}
-            style={{ originX: `${cx}px`, originY: '170px' }}
-          >
+            style={{ originX: `${cx}px`, originY: '170px' }}>
             <circle cx={cx} cy="170" r="26" stroke="url(#bp-stroke)" strokeWidth="1.75" />
             <circle cx={cx} cy="170" r="11" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
           </motion.g>
         ))}
 
-        {/* ── Maintenance nodes ── */}
         {(Object.keys(NODES) as BodyNode[]).map((key) => {
           const node = NODES[key]
           const isOn = active.includes(key)
           return (
             <g key={key}>
               {isOn && (
-                <motion.circle
-                  cx={node.x} cy={node.y} r="18"
-                  fill="#C49A45" fillOpacity="0.14"
+                <motion.circle cx={node.x} cy={node.y} r="18" fill="#C49A45" fillOpacity="0.14"
                   initial={{ scale: 0 }} animate={{ scale: [1, 1.35, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                />
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }} />
               )}
-              <motion.circle
-                cx={node.x} cy={node.y} r="4.5"
-                animate={{
-                  fill: isOn ? '#C49A45' : 'rgba(255,255,255,0.2)',
-                  filter: isOn ? 'url(#bp-glow)' : 'none',
-                }}
-                transition={{ duration: 0.3 }}
-              />
+              <motion.circle cx={node.x} cy={node.y} r="4.5"
+                animate={{ fill: isOn ? '#C49A45' : 'rgba(255,255,255,0.2)', filter: isOn ? 'url(#bp-glow)' : 'none' }}
+                transition={{ duration: 0.3 }} />
               {isOn && (
-                <motion.text
-                  x={node.x} y={node.y - 14}
-                  textAnchor="middle"
-                  className="fill-accent font-[family-name:var(--font-space-grotesk)]"
-                  fontSize="8" fontWeight="600"
-                  initial={{ opacity: 0, y: node.y - 8 }}
-                  animate={{ opacity: 1, y: node.y - 14 }}
-                >
+                <motion.text x={node.x} y={node.y - 14} textAnchor="middle"
+                  className="fill-accent font-[family-name:var(--font-space-grotesk)]" fontSize="8" fontWeight="600"
+                  initial={{ opacity: 0, y: node.y - 8 }} animate={{ opacity: 1, y: node.y - 14 }}>
                   {node.label}
                 </motion.text>
               )}

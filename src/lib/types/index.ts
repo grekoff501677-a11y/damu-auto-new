@@ -2,6 +2,20 @@
 // DAMU AUTO — TypeScript Types (mirrors database schema)
 // ============================================================
 
+export type BodyNode = 'engine' | 'cabin' | 'brakes' | 'transmission' | 'cooling'
+
+/** A single annotation on a vehicle blueprint (positions are % of the image). */
+export type BlueprintHotspot = {
+  id: string
+  x: number
+  y: number
+  /** ties the glow to a maintenance category; omit for a static annotation */
+  bodyNode?: BodyNode
+  label?: string
+  /** optional leader line drawn from the dot to (x2,y2); label sits at the end */
+  line?: { x2: number; y2: number }
+}
+
 export type CarModel = {
   id: string
   brand: string
@@ -13,6 +27,9 @@ export type CarModel = {
   is_active: boolean
   sort_order: number
   created_at: string
+  // blueprint (maintenance schematic)
+  blueprint_url?: string | null
+  blueprint_nodes?: BlueprintHotspot[] | null
 }
 
 export type ProductCategory = 'oil' | 'filter' | 'fluid' | 'spark_plug' | 'other'

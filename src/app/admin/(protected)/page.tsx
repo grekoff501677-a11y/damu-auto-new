@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { Package, FileText, Wrench, Users } from 'lucide-react'
+import { Package, FileText, Wrench, Users, Car } from 'lucide-react'
 
 const SECTIONS = [
   { href: '/admin/products',   icon: Package,  title: 'Товары',         desc: 'Добавление, редактирование и удаление позиций каталога' },
   { href: '/admin/blog',       icon: FileText, title: 'Блог / Статьи',  desc: 'Публикация обновлений и гайдов «Оригинал vs Подделка»' },
   { href: '/admin/calculator', icon: Wrench,   title: 'Калькулятор ТО', desc: 'Матрица интервалов замены и проверки по моделям' },
+  { href: '/admin/blueprints', icon: Car,      title: 'Схемы авто',     desc: 'Изображения моделей и интерактивные точки для блока ТО' },
   { href: '/admin/leads',      icon: Users,    title: 'Заявки',         desc: 'Просмотр входящих заявок с сайта' },
 ]
 

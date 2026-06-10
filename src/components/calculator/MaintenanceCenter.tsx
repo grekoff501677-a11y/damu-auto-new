@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { ExternalLink, CheckCircle2, AlertTriangle, Wrench } from 'lucide-react'
 import { VehicleBlueprint, type BodyNode } from './VehicleBlueprint'
-import { getBlueprint } from '@/lib/vehicle-blueprints'
 import { cn } from '@/lib/utils'
 import type { PublicMaintModel } from '@/lib/queries'
 
@@ -56,7 +55,7 @@ export function MaintenanceCenter({ models }: { models: PublicMaintModel[] }) {
         <div className="relative grid-backdrop border-b border-glass-border lg:border-b-0 lg:border-r">
           <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-gold-soft/5" />
           <div className="relative flex h-full min-h-[240px] items-center justify-center p-6">
-            <VehicleBlueprint active={activeNodes} blueprint={model ? getBlueprint(model.slug) : undefined} className="w-full max-w-md" />
+            <VehicleBlueprint active={activeNodes} blueprint={model?.blueprint} className="w-full max-w-md" />
           </div>
           <div className="absolute bottom-4 left-6 flex items-center gap-2 text-xs text-muted-foreground">
             <span className="h-2 w-2 animate-pulse rounded-full bg-accent shadow-[0_0_8px_2px_rgba(196,154,69,0.6)]" />

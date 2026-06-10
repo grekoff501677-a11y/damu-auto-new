@@ -1,6 +1,7 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
-import type { BodyNode } from '@/components/calculator/VehicleBlueprint'
+import type { BodyNode, BlueprintData } from '@/components/calculator/VehicleBlueprint'
+import { getBlueprint } from '@/lib/vehicle-blueprints'
 import type { Product, CarModel, BlogPost } from '@/lib/types'
 
 const KASPI_FALLBACK = 'https://kaspi.kz/shop'
@@ -81,7 +82,11 @@ export type PublicPart = {
   kaspiUrl: string
 }
 export type PublicMilestone = { km: number; months: number; parts: PublicPart[] }
-export type PublicMaintModel = { slug: string; brand: string; name: string; milestones: PublicMilestone[] }
+export type PublicMaintModel = {
+  slug: string; brand: string; name: string
+  milestones: PublicMilestone[]
+  blueprint?: BlueprintData
+}
 
 function inferNode(name: string): BodyNode {
   const n = name.toLowerCase()
@@ -135,12 +140,21 @@ export async function getMaintenanceModels(): Promise<PublicMaintModel[]> {
     byModel.set(r.car_model_id, arr)
   }
 
-  return ((models ?? []) as CarModel[]).map((m) => ({
-    slug: m.slug,
-    brand: m.brand,
-    name: m.name,
-    milestones: buildMilestones(byModel.get(m.id) ?? []),
-  }))
+  return ((models ?? []) as CarModel[]).map((m) => {
+    // DB blueprint takes precedence; fall back to the code config.
+    const dbHotspots = Array.isArray(m.blueprint_nodes) ? m.blueprint_nodes : []
+    const blueprint: BlueprintData | undefined =
+      m.blueprint_url && dbHotspots.length >= 0
+        ? { image: m.blueprint_url, hotspots: dbHotspots }
+        : getBlueprint(m.slug)
+    return {
+      slug: m.slug,
+      brand: m.brand,
+      name: m.name,
+      milestones: buildMilestones(byModel.get(m.id) ?? []),
+      blueprint,
+    }
+  })
 }
 
 // ============================================================
