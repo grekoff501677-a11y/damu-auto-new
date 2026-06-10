@@ -7,17 +7,32 @@ import { cn } from '@/lib/utils'
 const LOGO =
   'https://res.cloudinary.com/djjcxxgfm/image/upload/f_auto,q_auto,w_700/v1781090790/%D0%91%D0%B5%D0%B7_%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_%D0%BA%D0%BE%D0%BF%D0%B8%D1%8F_ibm0gt.svg'
 
-const R = 46
-const C = 2 * Math.PI * R
+// Symmetric comet: transparent → gold peak → transparent (tapers at both ends, no hard cut)
+const COMET =
+  'conic-gradient(from 0deg,' +
+  ' rgba(217,184,112,0) 0deg,' +
+  ' rgba(217,184,112,0.55) 16deg,' +
+  ' #FBE8C4 27deg,' +
+  ' rgba(217,184,112,0.55) 38deg,' +
+  ' rgba(217,184,112,0) 54deg,' +
+  ' rgba(217,184,112,0) 360deg)'
+
+// thin annulus masks — closest-side so 100% == half the box (edge), predictable sizing
+const RING_TRACK = 'radial-gradient(circle closest-side, transparent 0 90%, #000 92%, #000 94%, transparent 96%)'
+const RING_LINE  = 'radial-gradient(circle closest-side, transparent 0 89%, #000 91%, #000 94.5%, transparent 96.5%)'
+const RING_GLOW  = 'radial-gradient(circle closest-side, transparent 0 80%, #000 92%, transparent 104%)'
+
+const ROTATE = { rotate: 360 }
+const SPIN = { duration: 5.5, repeat: Infinity, ease: 'linear' as const }
 
 export function HeroLogo({ className }: { className?: string }) {
   return (
     <div className={cn('relative aspect-square', className)}>
-      {/* warm glow */}
+      {/* warm ambient glow */}
       <div
         aria-hidden
-        className="absolute inset-[14%] rounded-full blur-3xl"
-        style={{ background: 'radial-gradient(circle, rgba(196,154,69,0.20), transparent 70%)' }}
+        className="absolute inset-[16%] rounded-full blur-3xl"
+        style={{ background: 'radial-gradient(circle, rgba(196,154,69,0.18), transparent 70%)' }}
       />
 
       {/* logo */}
@@ -32,44 +47,44 @@ export function HeroLogo({ className }: { className?: string }) {
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       />
 
-      {/* gradient-traced ring (light pulse running around the logo) */}
-      <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full -rotate-90">
-        <defs>
-          <linearGradient id="hero-trace" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#FBE8C4" />
-            <stop offset="50%" stopColor="#D9B870" />
-            <stop offset="100%" stopColor="#C49A45" />
-          </linearGradient>
-          <filter id="hero-trace-glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="1.1" result="b" />
-            <feMerge>
-              <feMergeNode in="b" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
+      {/* faint full track ring */}
+      <div
+        aria-hidden
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: 'rgba(196,154,69,0.14)',
+          WebkitMaskImage: RING_TRACK,
+          maskImage: RING_TRACK,
+        }}
+      />
 
-        {/* faint base ring */}
-        <circle cx="50" cy="50" r={R} fill="none" stroke="rgba(196,154,69,0.16)" strokeWidth="0.5" />
+      {/* soft LED glow cast from the comet (blurred, reaches inward onto the logo) */}
+      <motion.div
+        aria-hidden
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: COMET,
+          WebkitMaskImage: RING_GLOW,
+          maskImage: RING_GLOW,
+          filter: 'blur(7px)',
+          opacity: 0.55,
+        }}
+        animate={ROTATE}
+        transition={SPIN}
+      />
 
-        {/* travelling light arc */}
-        <motion.circle
-          cx="50" cy="50" r={R} fill="none"
-          stroke="url(#hero-trace)" strokeWidth="1.1" strokeLinecap="round"
-          strokeDasharray={`${C * 0.2} ${C * 0.8}`}
-          filter="url(#hero-trace-glow)"
-          animate={{ strokeDashoffset: [C, 0] }}
-          transition={{ duration: 4.5, repeat: Infinity, ease: 'linear' }}
-        />
-        {/* second, shorter trailing arc for depth */}
-        <motion.circle
-          cx="50" cy="50" r={R} fill="none"
-          stroke="url(#hero-trace)" strokeWidth="0.6" strokeLinecap="round" strokeOpacity="0.5"
-          strokeDasharray={`${C * 0.06} ${C * 0.94}`}
-          animate={{ strokeDashoffset: [C, 0] }}
-          transition={{ duration: 4.5, repeat: Infinity, ease: 'linear', delay: 0.4 }}
-        />
-      </svg>
+      {/* crisp comet line (tapered both ends) */}
+      <motion.div
+        aria-hidden
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: COMET,
+          WebkitMaskImage: RING_LINE,
+          maskImage: RING_LINE,
+        }}
+        animate={ROTATE}
+        transition={SPIN}
+      />
     </div>
   )
 }
