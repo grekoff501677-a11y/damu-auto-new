@@ -12,8 +12,9 @@ export type BlueprintHotspot = {
   /** ties the glow to a maintenance category; omit for a static annotation */
   bodyNode?: BodyNode
   label?: string
-  /** optional leader line drawn from the dot to (x2,y2); label sits at the end */
-  line?: { x2: number; y2: number }
+  /** optional leader line drawn from the dot to (x2,y2); label sits at the end.
+   *  cx/cy = optional quadratic-bezier control point → curved line. */
+  line?: { x2: number; y2: number; cx?: number; cy?: number }
 }
 
 export type CarModel = {

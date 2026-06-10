@@ -15,10 +15,11 @@ const BODY_NODES: { value: BodyNode | ''; label: string }[] = [
   { value: 'brakes',       label: 'Тормоза / подвеска' },
 ]
 
-type Drag = { id: string; kind: 'dot' | 'line' } | null
+type Drag = { id: string; kind: 'dot' | 'line' | 'ctrl' } | null
 
 let idc = 0
 const newId = () => `h${Date.now().toString(36)}${idc++}`
+const clampPct = (n: number) => Math.round(Math.min(100, Math.max(0, n)) * 10) / 10
 
 export function BlueprintEditor({
   modelId, modelName, initialUrl, initialHotspots,
@@ -66,8 +67,24 @@ export function BlueprintEditor({
   function onPointerMove(e: React.PointerEvent) {
     if (!drag) return
     const { x, y } = pctFromEvent(e)
-    if (drag.kind === 'dot') patch(drag.id, { x, y })
-    else patch(drag.id, { line: { x2: x, y2: y } })
+    if (drag.kind === 'dot') { patch(drag.id, { x, y }); return }
+    const h = hotspots.find((p) => p.id === drag.id)
+    if (!h?.line) return
+    if (drag.kind === 'line') patch(drag.id, { line: { ...h.line, x2: x, y2: y } })
+    else patch(drag.id, { line: { ...h.line, cx: x, cy: y } })
+  }
+
+  function toggleCurve(h: BlueprintHotspot) {
+    if (!h.line) return
+    if (h.line.cx != null) {
+      const { x2, y2 } = h.line
+      patch(h.id, { line: { x2, y2 } }) // back to straight
+    } else {
+      // control point at the midpoint, nudged perpendicular for a visible bend
+      const mx = (h.x + h.line.x2) / 2
+      const my = (h.y + h.line.y2) / 2
+      patch(h.id, { line: { ...h.line, cx: clampPct(mx + 8), cy: clampPct(my - 8) } })
+    }
   }
 
   function remove(id: string) {
@@ -115,12 +132,15 @@ export function BlueprintEditor({
             ? <img src={url} alt="" className="pointer-events-none relative block h-auto w-full" />
             : <div className="grid h-[280px] place-items-center text-sm text-muted-foreground">Вставьте URL изображения выше</div>}
 
-          {/* leader lines */}
+          {/* leader lines (straight or curved) */}
           <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             {hotspots.filter((h) => h.line).map((h) => {
               const on = preview && !!h.bodyNode
-              return <line key={h.id} x1={h.x} y1={h.y} x2={h.line!.x2} y2={h.line!.y2}
-                stroke={on ? '#EAF6FF' : 'rgba(196,154,69,0.6)'} strokeWidth={1} vectorEffect="non-scaling-stroke" />
+              const l = h.line!
+              const stroke = on ? '#9FE0FF' : 'rgba(196,154,69,0.6)'
+              return l.cx != null && l.cy != null
+                ? <path key={h.id} d={`M ${h.x} ${h.y} Q ${l.cx} ${l.cy} ${l.x2} ${l.y2}`} fill="none" stroke={stroke} strokeWidth={1} vectorEffect="non-scaling-stroke" />
+                : <line key={h.id} x1={h.x} y1={h.y} x2={l.x2} y2={l.y2} stroke={stroke} strokeWidth={1} vectorEffect="non-scaling-stroke" />
             })}
           </svg>
 
@@ -156,6 +176,19 @@ export function BlueprintEditor({
                     style={{ left: `${h.line.x2}%`, top: `${h.line.y2}%` }}
                   >
                     <span className="block rounded-sm bg-sky-300" style={{ width: 8, height: 8, boxShadow: '0 0 0 2px #061521' }} />
+                  </button>
+                )}
+
+                {/* curve control-point handle */}
+                {h.line && h.line.cx != null && h.line.cy != null && (
+                  <button
+                    onClick={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => { e.stopPropagation(); setSelected(h.id); setDrag({ id: h.id, kind: 'ctrl' }) }}
+                    className="absolute -translate-x-1/2 -translate-y-1/2 cursor-grab"
+                    style={{ left: `${h.line.cx}%`, top: `${h.line.cy}%` }}
+                    title="Точка изгиба"
+                  >
+                    <span className="block rotate-45 bg-amber-300" style={{ width: 9, height: 9, boxShadow: '0 0 0 2px #061521' }} />
                   </button>
                 )}
 
@@ -228,7 +261,16 @@ export function BlueprintEditor({
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
-            <p className="text-[11px] text-muted-foreground">X {sel.x}% · Y {sel.y}%{sel.line ? ` · линия → ${sel.line.x2}/${sel.line.y2}` : ''}</p>
+            {sel.line && (
+              <button onClick={() => toggleCurve(sel)}
+                className={cn('flex min-h-10 w-full items-center justify-center gap-1.5 rounded-lg border text-sm font-600 cursor-pointer',
+                  sel.line.cx != null ? 'border-amber-300/40 text-amber-300' : 'border-input text-muted-foreground hover:border-accent/40')}>
+                <Spline className="h-4 w-4" /> {sel.line.cx != null ? 'Сделать прямой' : 'Изогнуть линию'}
+              </button>
+            )}
+            <p className="text-[11px] text-muted-foreground">
+              X {sel.x}% · Y {sel.y}%{sel.line ? ` · линия → ${sel.line.x2}/${sel.line.y2}${sel.line.cx != null ? ' · кривая' : ''}` : ''}
+            </p>
           </div>
         )}
 

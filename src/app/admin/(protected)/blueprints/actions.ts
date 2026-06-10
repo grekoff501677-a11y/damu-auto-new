@@ -14,7 +14,15 @@ export async function saveBlueprint(modelId: string, url: string, hotspots: Blue
     y: clamp(h.y),
     bodyNode: h.bodyNode,
     label: (h.label ?? '').slice(0, 60),
-    line: h.line ? { x2: clamp(h.line.x2), y2: clamp(h.line.y2) } : undefined,
+    line: h.line
+      ? {
+          x2: clamp(h.line.x2),
+          y2: clamp(h.line.y2),
+          ...(h.line.cx != null && h.line.cy != null
+            ? { cx: clamp(h.line.cx), cy: clamp(h.line.cy) }
+            : {}),
+        }
+      : undefined,
   }))
 
   const { error } = await supabase
