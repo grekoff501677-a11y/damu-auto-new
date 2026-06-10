@@ -36,7 +36,17 @@ export type BlueprintConfig = {
  * },
  */
 export const VEHICLE_BLUEPRINTS: Record<string, BlueprintConfig> = {
-  // Add entries here once blueprint images are uploaded.
+  'geely-monjaro': {
+    image:
+      'https://res.cloudinary.com/djjcxxgfm/image/upload/v1781078459/%D0%94%D0%B8%D0%B7%D0%B0%D0%B9%D0%BD_%D0%B1%D0%B5%D0%B7_%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_mnsl8e.svg',
+    nodes: {
+      engine:       { x: 30, y: 51 },
+      cooling:      { x: 17, y: 55 },
+      cabin:        { x: 51, y: 37 },
+      transmission: { x: 54, y: 62 },
+      brakes:       { x: 32, y: 72 },
+    },
+  },
 }
 
 export function getBlueprint(slug: string): BlueprintConfig | undefined {

@@ -36,7 +36,7 @@ export function VehicleBlueprint({ active, className, blueprint }: Props) {
     return (
       <div className={cn('relative', className)}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={blueprint.image} alt="Схема автомобиля" className="h-full w-full object-contain" />
+        <img src={blueprint.image} alt="Схема автомобиля" loading="lazy" decoding="async" className="h-full w-full object-contain" />
         {entries.map(([node, pos]) => {
           const on = active.includes(node)
           return (
