@@ -4,6 +4,7 @@ import { Reveal } from '@/components/shared/Reveal'
 import { MaintenanceCenter } from '@/components/calculator/MaintenanceCenter'
 import { MacroCompareSlider } from '@/components/blog/MacroCompareSlider'
 import { LeadForm } from '@/components/forms/LeadForm'
+import { HeroLogo } from '@/components/shared/HeroLogo'
 import { getMaintenanceModels, getCarModels } from '@/lib/queries'
 import {
   TEXTURE_ORIGINAL_FILTER, TEXTURE_FAKE_FILTER,
@@ -26,6 +27,11 @@ export default async function HomePage() {
       <section className="relative overflow-hidden">
         <div className="grid-backdrop absolute inset-0 -z-10 opacity-50" />
         <div className="absolute left-1/2 top-0 -z-10 h-[400px] w-[700px] -translate-x-1/2 rounded-full bg-accent/10 blur-[120px]" />
+
+        {/* gradient-traced logo on the right (desktop) */}
+        <div className="pointer-events-none absolute inset-y-0 right-2 z-0 hidden items-center justify-center md:flex lg:right-12">
+          <HeroLogo className="w-[clamp(320px,34vw,520px)]" />
+        </div>
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 pb-12 md:pt-28 md:pb-16">
           <Reveal>
