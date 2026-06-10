@@ -33,7 +33,12 @@ export default async function HomePage() {
           <HeroLogo className="w-[clamp(320px,34vw,520px)]" />
         </div>
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 pb-12 md:pt-28 md:pb-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-12 md:pt-28 md:pb-16">
+          {/* logo for mobile (centered above the headline) */}
+          <div className="mb-6 flex justify-center md:hidden">
+            <HeroLogo className="w-52" />
+          </div>
+
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-glass-border bg-surface/60 px-3 py-1 text-xs font-500 text-muted-foreground backdrop-blur-md">
               <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgba(196,154,69,0.6)]" />

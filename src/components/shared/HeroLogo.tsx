@@ -7,84 +7,81 @@ import { cn } from '@/lib/utils'
 const LOGO =
   'https://res.cloudinary.com/djjcxxgfm/image/upload/f_auto,q_auto,w_700/v1781090790/%D0%91%D0%B5%D0%B7_%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_%D0%BA%D0%BE%D0%BF%D0%B8%D1%8F_ibm0gt.svg'
 
-// Symmetric comet: transparent → gold peak → transparent (tapers at both ends, no hard cut)
-const COMET =
+// One-tailed comet: bright head at 0deg (top), single tail trailing clockwise.
+const TAIL =
   'conic-gradient(from 0deg,' +
-  ' rgba(217,184,112,0) 0deg,' +
-  ' rgba(217,184,112,0.55) 16deg,' +
-  ' #FBE8C4 27deg,' +
-  ' rgba(217,184,112,0.55) 38deg,' +
-  ' rgba(217,184,112,0) 54deg,' +
+  ' #FFF6E2 0deg,' +
+  ' rgba(217,184,112,0.75) 14deg,' +
+  ' rgba(217,184,112,0.35) 48deg,' +
+  ' rgba(217,184,112,0.10) 92deg,' +
+  ' rgba(217,184,112,0) 135deg,' +
   ' rgba(217,184,112,0) 360deg)'
 
-// thin annulus masks — closest-side so 100% == half the box (edge), predictable sizing
-const RING_TRACK = 'radial-gradient(circle closest-side, transparent 0 90%, #000 92%, #000 94%, transparent 96%)'
-const RING_LINE  = 'radial-gradient(circle closest-side, transparent 0 89%, #000 91%, #000 94.5%, transparent 96.5%)'
-const RING_GLOW  = 'radial-gradient(circle closest-side, transparent 0 80%, #000 92%, transparent 104%)'
+// thin annulus for the comet line (closest-side → 100% == half the box)
+const RING = 'radial-gradient(circle closest-side, transparent 0 89%, #000 91%, #000 94.5%, transparent 96.5%)'
 
-const ROTATE = { rotate: 360 }
-const SPIN = { duration: 5.5, repeat: Infinity, ease: 'linear' as const }
+const SPIN = { duration: 6, repeat: Infinity, ease: 'linear' as const }
+const CW = { rotate: 360 }
+
+const LOGO_BOX = 'absolute inset-[11%] h-[78%] w-[78%] object-contain'
 
 export function HeroLogo({ className }: { className?: string }) {
   return (
     <div className={cn('relative aspect-square', className)}>
-      {/* warm ambient glow */}
+      {/* soft ambient glow (no hard boundary) */}
       <div
         aria-hidden
-        className="absolute inset-[16%] rounded-full blur-3xl"
-        style={{ background: 'radial-gradient(circle, rgba(196,154,69,0.18), transparent 70%)' }}
+        className="absolute inset-0 rounded-full"
+        style={{ background: 'radial-gradient(circle, rgba(196,154,69,0.08), transparent 66%)' }}
       />
 
-      {/* logo */}
-      <motion.img
-        src={LOGO}
-        alt="Damu Auto"
-        loading="lazy"
-        decoding="async"
-        className="absolute inset-[11%] h-[78%] w-[78%] object-contain"
-        initial={{ opacity: 0, scale: 0.92 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+      {/* logo, held in a light shadow (visible, slightly subdued) */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={LOGO} alt="Damu Auto" loading="lazy" decoding="async"
+        className={LOGO_BOX}
+        style={{ filter: 'brightness(0.9) saturate(0.97)' }}
       />
+
+      {/* travelling light that follows the comet and lifts the nearby part of the logo */}
+      <motion.div aria-hidden className="absolute inset-0" style={{ mixBlendMode: 'screen' }} animate={CW} transition={SPIN}>
+        <div
+          className="absolute rounded-full"
+          style={{
+            left: '50%', top: '16%', width: '66%', aspectRatio: '1',
+            transform: 'translate(-50%, -50%)',
+            background:
+              'radial-gradient(circle, rgba(255,248,230,0.72) 0%, rgba(217,184,112,0.40) 34%, rgba(217,184,112,0.12) 60%, transparent 76%)',
+            filter: 'blur(2px)',
+          }}
+        />
+      </motion.div>
 
       {/* faint full track ring */}
       <div
         aria-hidden
         className="absolute inset-0 rounded-full"
-        style={{
-          background: 'rgba(196,154,69,0.14)',
-          WebkitMaskImage: RING_TRACK,
-          maskImage: RING_TRACK,
-        }}
+        style={{ background: 'rgba(196,154,69,0.12)', WebkitMaskImage: RING, maskImage: RING }}
       />
 
-      {/* soft LED glow cast from the comet (blurred, reaches inward onto the logo) */}
-      <motion.div
-        aria-hidden
-        className="absolute inset-0 rounded-full"
-        style={{
-          background: COMET,
-          WebkitMaskImage: RING_GLOW,
-          maskImage: RING_GLOW,
-          filter: 'blur(7px)',
-          opacity: 0.55,
-        }}
-        animate={ROTATE}
-        transition={SPIN}
-      />
-
-      {/* crisp comet line (tapered both ends) */}
-      <motion.div
-        aria-hidden
-        className="absolute inset-0 rounded-full"
-        style={{
-          background: COMET,
-          WebkitMaskImage: RING_LINE,
-          maskImage: RING_LINE,
-        }}
-        animate={ROTATE}
-        transition={SPIN}
-      />
+      {/* comet (tail + head), orbiting in sync with the light */}
+      <motion.div aria-hidden className="absolute inset-0" animate={CW} transition={SPIN}>
+        {/* single tail */}
+        <div
+          className="absolute inset-0 rounded-full"
+          style={{ background: TAIL, WebkitMaskImage: RING, maskImage: RING }}
+        />
+        {/* glowing head dot at 12 o'clock (sits on the ring) */}
+        <div
+          className="absolute rounded-full"
+          style={{
+            left: '50%', top: '3.5%', width: '4.4%', aspectRatio: '1',
+            transform: 'translate(-50%, -50%)',
+            background: '#FFF7E6',
+            boxShadow: '0 0 10px 3px rgba(251,232,196,0.95), 0 0 24px 9px rgba(217,184,112,0.5)',
+          }}
+        />
+      </motion.div>
     </div>
   )
 }
