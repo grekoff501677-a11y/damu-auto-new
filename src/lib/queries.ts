@@ -2,6 +2,7 @@ import 'server-only'
 import { createClient } from '@/lib/supabase/server'
 import type { BodyNode, BlueprintData } from '@/components/calculator/VehicleBlueprint'
 import { getBlueprint } from '@/lib/vehicle-blueprints'
+import { resolveSections, type ResolvedSection } from '@/lib/page-sections'
 import type { Product, CarModel, BlogPost } from '@/lib/types'
 
 const KASPI_FALLBACK = 'https://kaspi.kz/shop'
@@ -179,4 +180,17 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
   const supabase = await createClient()
   const { data } = await supabase.from('blog_posts').select('*').eq('slug', slug).eq('published', true).single()
   return (data as BlogPost) ?? null
+}
+
+// ============================================================
+// Home page sections (visible, ordered). Falls back to registry
+// defaults if the page_sections table is empty/not yet migrated.
+// ============================================================
+export async function getHomeSections(): Promise<ResolvedSection[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('page_sections')
+    .select('section_key, sort_order, is_visible, config')
+    .eq('page', 'home')
+  return resolveSections(data ?? []).filter((s) => s.visible)
 }

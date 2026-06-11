@@ -189,3 +189,36 @@ CREATE POLICY "admin_all_compat"     ON product_compatibility
   USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 CREATE POLICY "admin_all_blog_prods" ON blog_post_products
   USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+
+-- ============================================================
+-- 8. PAGE SECTIONS (home-page section manager)
+-- ============================================================
+-- Per-section order / visibility / editable texts for the home page.
+-- section_key values are fixed in code (src/lib/page-sections.ts).
+CREATE TABLE page_sections (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  page         TEXT NOT NULL DEFAULT 'home',
+  section_key  TEXT NOT NULL,
+  sort_order   SMALLINT NOT NULL DEFAULT 0,
+  is_visible   BOOLEAN NOT NULL DEFAULT TRUE,
+  config       JSONB NOT NULL DEFAULT '{}',
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (page, section_key)
+);
+
+ALTER TABLE page_sections ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public_read_sections" ON page_sections FOR SELECT USING (TRUE);
+CREATE POLICY "admin_all_sections" ON page_sections
+  USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+
+CREATE TRIGGER page_sections_updated_at
+  BEFORE UPDATE ON page_sections
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+INSERT INTO page_sections (page, section_key, sort_order, is_visible) VALUES
+  ('home', 'hero',        1, TRUE),
+  ('home', 'features',    2, TRUE),
+  ('home', 'maintenance', 3, TRUE),
+  ('home', 'originality', 4, TRUE),
+  ('home', 'lead_form',   5, TRUE)
+ON CONFLICT (page, section_key) DO NOTHING;
