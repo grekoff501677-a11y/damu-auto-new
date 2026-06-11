@@ -11,6 +11,8 @@ interface GradientTracingProps {
   animationDuration?: number
   strokeWidth?: number
   path?: string
+  /** scale to the parent box (width/height become the viewBox design space) */
+  responsive?: boolean
 }
 
 export const GradientTracing: React.FC<GradientTracingProps> = ({
@@ -21,12 +23,13 @@ export const GradientTracing: React.FC<GradientTracingProps> = ({
   animationDuration = 2,
   strokeWidth = 2,
   path = `M0,${height / 2} L${width},${height / 2}`,
+  responsive = false,
 }) => {
   const gradientId = `pulse-${Math.random().toString(36).substr(2, 9)}`
 
   return (
-    <div className="relative" style={{ width, height }}>
-      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} fill="none">
+    <div className="relative" style={responsive ? { width: '100%', height: '100%' } : { width, height }}>
+      <svg width={responsive ? '100%' : width} height={responsive ? '100%' : height} viewBox={`0 0 ${width} ${height}`} fill="none">
         <path d={path} stroke={baseColor} strokeOpacity="0.2" strokeWidth={strokeWidth} />
         <path d={path} stroke={`url(#${gradientId})`} strokeLinecap="round" strokeWidth={strokeWidth} />
         <defs>
