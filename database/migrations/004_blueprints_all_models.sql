@@ -17,13 +17,13 @@ SET blueprint_url = 'https://res.cloudinary.com/djjcxxgfm/image/upload/v17811606
 WHERE slug = 'geely-atlas';
 
 UPDATE car_models
-SET blueprint_url = 'https://res.cloudinary.com/djjcxxgfm/image/upload/v1781160649/Coolray_1_l2sbxn.svg',
+SET blueprint_url = 'https://res.cloudinary.com/djjcxxgfm/image/upload/v1781162008/Coolray_New_nhihis.svg',
     blueprint_nodes = '[
-      {"id":"c1","x":26,"y":45,"bodyNode":"engine","label":"Двигатель"},
-      {"id":"c2","x":15,"y":54,"bodyNode":"cooling","label":"Охлаждение"},
-      {"id":"c3","x":52,"y":30,"bodyNode":"cabin","label":"Салон"},
-      {"id":"c4","x":33,"y":59,"bodyNode":"transmission","label":"Трансмиссия"},
-      {"id":"c5","x":46,"y":63,"bodyNode":"brakes","label":"Тормоза / подвеска"}
+      {"id":"c1","x":26,"y":46,"bodyNode":"engine","label":"Двигатель"},
+      {"id":"c2","x":14,"y":53,"bodyNode":"cooling","label":"Охлаждение"},
+      {"id":"c3","x":48,"y":29,"bodyNode":"cabin","label":"Салон"},
+      {"id":"c4","x":31,"y":58,"bodyNode":"transmission","label":"Трансмиссия"},
+      {"id":"c5","x":45,"y":60,"bodyNode":"brakes","label":"Тормоза / подвеска"}
     ]'::jsonb
 WHERE slug = 'geely-coolray';
 
