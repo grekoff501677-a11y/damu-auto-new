@@ -176,12 +176,20 @@
   background-size: 48px 48px;
 }
 
-/* Marquee */
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+/* Gold shimmer — a soft highlight sweeps across the text once per cycle,
+   the rest of the time it sits still (used by the Geely Club offer line) */
+@keyframes shimmer-sweep {
+  0%, 64%   { background-position: 130% 0; }
+  92%, 100% { background-position: -30% 0; }
 }
-.animate-marquee { animation: marquee 28s linear infinite; }
+.shimmer-gold {
+  background: linear-gradient(100deg, #C49A45 42%, #F1DFAE 50%, #C49A45 58%);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-sweep 8s ease-in-out infinite;
+}
 
 /* Min touch target helper (48x48) */
 .touch-target { min-height: 48px; min-width: 48px; }

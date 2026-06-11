@@ -39,20 +39,15 @@ export function Header() {
 
   return (
     <>
-      {/* Geely Club marquee */}
-      <div className="relative z-50 overflow-hidden border-b border-glass-border bg-accent/5">
-        <div className="flex w-max animate-marquee whitespace-nowrap py-1.5">
-          {Array.from({ length: 2 }).map((_, dup) => (
-            <div key={dup} className="flex items-center" aria-hidden={dup === 1}>
-              {Array.from({ length: 6 }).map((_, i) => (
-                <span key={i} className="mx-6 flex items-center gap-2 text-xs font-medium tracking-wide text-accent">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Geely Club Pavlodar — VIP-скидка&nbsp;5% на все заказы
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
+      {/* Geely Club offer — static refined line, a gold shimmer passes over
+          the text every few seconds instead of a scrolling marquee */}
+      <div className="relative z-50 border-b border-glass-border bg-accent/5">
+        <p className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-1.5 text-xs font-medium tracking-wide">
+          <Sparkles className="h-3.5 w-3.5 shrink-0 text-accent" />
+          <span className="shimmer-gold whitespace-nowrap">
+            Geely Club Pavlodar — VIP-скидка&nbsp;5% на все заказы
+          </span>
+        </p>
       </div>
 
       {/* Floating glass nav */}
