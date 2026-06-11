@@ -12,6 +12,7 @@
 export type SectionFieldDef =
   | { kind: 'text'; key: string; label: string; placeholder?: string }
   | { kind: 'textarea'; key: string; label: string; placeholder?: string }
+  | { kind: 'toggle'; key: string; label: string }
   | {
       kind: 'list'
       key: string
@@ -49,8 +50,12 @@ export const SECTION_REGISTRY: SectionDef[] = [
       subtitle:
         'Инженерный подход без воды. Интерактивный центр ТО, макро-сравнение оригинала и подделки, каталог с проверенными OEM-номерами.',
       ctaPrimary: 'Открыть каталог',
+      ctaPrimaryHref: '/catalog',
       ctaSecondary: 'Центр ТО',
+      ctaSecondaryHref: '/calculator',
+      ctaSecondaryOn: true,
       modelsLabel: 'Модели:',
+      modelsOn: true,
     },
     fields: [
       { kind: 'text', key: 'badge', label: 'Бейдж над заголовком' },
@@ -58,8 +63,12 @@ export const SECTION_REGISTRY: SectionDef[] = [
       { kind: 'text', key: 'titleAccent', label: 'Заголовок — золотое слово' },
       { kind: 'text', key: 'titlePost', label: 'Заголовок — окончание (с градиентом)' },
       { kind: 'textarea', key: 'subtitle', label: 'Подзаголовок' },
-      { kind: 'text', key: 'ctaPrimary', label: 'Кнопка 1 (каталог)' },
-      { kind: 'text', key: 'ctaSecondary', label: 'Кнопка 2 (Центр ТО)' },
+      { kind: 'text', key: 'ctaPrimary', label: 'Кнопка 1 — текст' },
+      { kind: 'text', key: 'ctaPrimaryHref', label: 'Кнопка 1 — ссылка', placeholder: '/catalog или https://...' },
+      { kind: 'toggle', key: 'ctaSecondaryOn', label: 'Показывать кнопку 2' },
+      { kind: 'text', key: 'ctaSecondary', label: 'Кнопка 2 — текст' },
+      { kind: 'text', key: 'ctaSecondaryHref', label: 'Кнопка 2 — ссылка', placeholder: '/calculator или https://...' },
+      { kind: 'toggle', key: 'modelsOn', label: 'Показывать чипы моделей' },
       { kind: 'text', key: 'modelsLabel', label: 'Подпись к чипам моделей' },
     ],
   },

@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { Reorder, useDragControls } from 'motion/react'
 import {
-  ChevronUp, ChevronDown, Eye, EyeOff, Pencil, X, Plus, Trash2,
-  Save, Loader2, Check, RotateCcw, GripVertical,
+  Eye, EyeOff, Pencil, X, Plus, Trash2, Save, Loader2, Check, RotateCcw,
+  GripVertical, Monitor, Smartphone, RefreshCw,
 } from 'lucide-react'
 import { SECTION_REGISTRY, type SectionDef, type SectionConfig } from '@/lib/page-sections'
-import { TextField, TextArea, Label } from '@/components/admin/AdminField'
+import { TextField, TextArea, Label, Toggle } from '@/components/admin/AdminField'
 import { cn } from '@/lib/utils'
 import { saveSectionConfig, setSectionVisible, reorderSections, resetSectionConfig } from './actions'
 
@@ -17,16 +18,17 @@ const meta = (key: string) => SECTION_REGISTRY.find((s) => s.key === key) as Sec
 export function SectionManager({ initial }: { initial: SItem[] }) {
   const [sections, setSections] = useState<SItem[]>(initial)
   const [editing, setEditing] = useState<string | null>(null)
-  const [, startReorder] = useTransition()
+  const [nonce, setNonce] = useState(0)
   const [busyVis, setBusyVis] = useState<string | null>(null)
+  const [, startReorder] = useTransition()
 
-  function move(i: number, dir: -1 | 1) {
-    const j = i + dir
-    if (j < 0 || j >= sections.length) return
-    const next = [...sections]
-    ;[next[i], next[j]] = [next[j], next[i]]
+  const refresh = () => setNonce((n) => n + 1)
+
+  function onReorder(next: SItem[]) {
     setSections(next)
-    startReorder(() => { reorderSections(next.map((s) => s.key)) })
+  }
+  function commitOrder() {
+    startReorder(async () => { await reorderSections(sections.map((s) => s.key)); refresh() })
   }
 
   function toggle(key: string) {
@@ -35,66 +37,115 @@ export function SectionManager({ initial }: { initial: SItem[] }) {
     const visible = !cur.visible
     setSections((ss) => ss.map((s) => (s.key === key ? { ...s, visible } : s)))
     setBusyVis(key)
-    setSectionVisible(key, visible).finally(() => setBusyVis(null))
+    setSectionVisible(key, visible).finally(() => { setBusyVis(null); refresh() })
   }
 
   function onSaved(key: string, config: SectionConfig) {
     setSections((ss) => ss.map((s) => (s.key === key ? { ...s, config } : s)))
     setEditing(null)
+    refresh()
   }
 
   return (
-    <div className="space-y-2.5">
-      {sections.map((s, i) => {
-        const m = meta(s.key)
-        const isEditing = editing === s.key
-        return (
-          <div key={s.key} className={cn('glass overflow-hidden rounded-2xl border', s.visible ? 'border-glass-border' : 'border-glass-border opacity-60')}>
-            <div className="flex items-center gap-3 p-3.5">
-              {/* reorder */}
-              <div className="flex flex-col">
-                <button onClick={() => move(i, -1)} disabled={i === 0}
-                  className="flex h-5 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:text-foreground disabled:opacity-25 cursor-pointer" aria-label="Выше">
-                  <ChevronUp className="h-4 w-4" />
-                </button>
-                <button onClick={() => move(i, 1)} disabled={i === sections.length - 1}
-                  className="flex h-5 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:text-foreground disabled:opacity-25 cursor-pointer" aria-label="Ниже">
-                  <ChevronDown className="h-4 w-4" />
-                </button>
-              </div>
-              <GripVertical className="hidden h-4 w-4 shrink-0 text-muted-foreground/40 sm:block" />
+    <div className="grid gap-5 lg:grid-cols-[1fr_minmax(340px,400px)]">
+      {/* ── section list (drag to reorder) ── */}
+      <div>
+        <Reorder.Group axis="y" values={sections} onReorder={onReorder} className="space-y-2.5">
+          {sections.map((s) => (
+            <SectionRow
+              key={s.key} item={s} editing={editing === s.key} busyVis={busyVis === s.key}
+              onToggle={() => toggle(s.key)} onEdit={() => setEditing(editing === s.key ? null : s.key)}
+              onDragEnd={commitOrder} onSaved={(cfg) => onSaved(s.key, cfg)}
+            />
+          ))}
+        </Reorder.Group>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Тяните за <GripVertical className="inline h-3.5 w-3.5" /> чтобы менять порядок. Глазом — скрыть/показать, карандашом — тексты и кнопки.
+        </p>
+      </div>
 
-              {/* title + note */}
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-heading text-sm font-600">{m.label}</p>
-                <p className="truncate text-xs text-muted-foreground">{m.note}</p>
-              </div>
-
-              {/* visibility */}
-              <button onClick={() => toggle(s.key)}
-                className={cn('flex h-9 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-600 transition-colors cursor-pointer',
-                  s.visible ? 'border-accent/40 text-accent' : 'border-input text-muted-foreground hover:text-foreground')}>
-                {busyVis === s.key ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  : s.visible ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
-                <span className="hidden sm:inline">{s.visible ? 'Видна' : 'Скрыта'}</span>
-              </button>
-
-              {/* edit */}
-              <button onClick={() => setEditing(isEditing ? null : s.key)}
-                className={cn('flex h-9 w-9 items-center justify-center rounded-lg border transition-colors cursor-pointer',
-                  isEditing ? 'border-accent/40 text-accent' : 'border-input text-muted-foreground hover:text-foreground')}
-                aria-label="Редактировать тексты">
-                {isEditing ? <X className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
-              </button>
-            </div>
-
-            {isEditing && (
-              <SectionEditor section={s} def={m} onSaved={(cfg) => onSaved(s.key, cfg)} />
-            )}
-          </div>
-        )
-      })}
+      {/* ── live preview ── */}
+      <PreviewPanel nonce={nonce} onRefresh={refresh} />
     </div>
+  )
+}
+
+function SectionRow({ item, editing, busyVis, onToggle, onEdit, onDragEnd, onSaved }: {
+  item: SItem; editing: boolean; busyVis: boolean
+  onToggle: () => void; onEdit: () => void; onDragEnd: () => void; onSaved: (cfg: SectionConfig) => void
+}) {
+  const controls = useDragControls()
+  const m = meta(item.key)
+  return (
+    <Reorder.Item value={item} dragListener={false} dragControls={controls} onDragEnd={onDragEnd}
+      className={cn('glass overflow-hidden rounded-2xl border', item.visible ? 'border-glass-border' : 'border-glass-border opacity-60')}>
+      <div className="flex items-center gap-3 p-3.5">
+        <button onPointerDown={(e) => controls.start(e)}
+          className="flex h-9 w-7 shrink-0 cursor-grab touch-none items-center justify-center rounded text-muted-foreground/50 transition-colors hover:text-foreground active:cursor-grabbing" aria-label="Перетащить">
+          <GripVertical className="h-4 w-4" />
+        </button>
+
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-heading text-sm font-600">{m.label}</p>
+          <p className="truncate text-xs text-muted-foreground">{m.note}</p>
+        </div>
+
+        <button onClick={onToggle}
+          className={cn('flex h-9 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-600 transition-colors cursor-pointer',
+            item.visible ? 'border-accent/40 text-accent' : 'border-input text-muted-foreground hover:text-foreground')}>
+          {busyVis ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            : item.visible ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+          <span className="hidden sm:inline">{item.visible ? 'Видна' : 'Скрыта'}</span>
+        </button>
+
+        <button onClick={onEdit}
+          className={cn('flex h-9 w-9 items-center justify-center rounded-lg border transition-colors cursor-pointer',
+            editing ? 'border-accent/40 text-accent' : 'border-input text-muted-foreground hover:text-foreground')}
+          aria-label="Редактировать">
+          {editing ? <X className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+        </button>
+      </div>
+
+      {editing && <SectionEditor section={item} def={m} onSaved={onSaved} />}
+    </Reorder.Item>
+  )
+}
+
+function PreviewPanel({ nonce, onRefresh }: { nonce: number; onRefresh: () => void }) {
+  const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop')
+  return (
+    <div className="lg:sticky lg:top-20 h-fit">
+      <div className="mb-2 flex items-center justify-between">
+        <span className="text-xs font-600 uppercase tracking-widest text-muted-foreground">Превью</span>
+        <div className="flex items-center gap-1">
+          <DeviceBtn active={device === 'desktop'} onClick={() => setDevice('desktop')} icon={<Monitor className="h-4 w-4" />} label="Десктоп" />
+          <DeviceBtn active={device === 'mobile'} onClick={() => setDevice('mobile')} icon={<Smartphone className="h-4 w-4" />} label="Моб" />
+          <button onClick={onRefresh} title="Обновить превью"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-input text-muted-foreground transition-colors hover:text-foreground cursor-pointer">
+            <RefreshCw className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+      <div className="overflow-hidden rounded-2xl border border-glass-border bg-surface">
+        <div className={cn('mx-auto bg-background', device === 'mobile' ? 'w-[390px] max-w-full' : 'w-full')}>
+          <iframe key={`${device}-${nonce}`} src="/" title="Превью главной"
+            className="block h-[640px] w-full border-0" />
+        </div>
+      </div>
+      <p className="mt-2 text-[11px] text-muted-foreground/70">
+        Превью обновляется после сохранения. Десктоп показан в масштабе колонки.
+      </p>
+    </div>
+  )
+}
+
+function DeviceBtn({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
+  return (
+    <button onClick={onClick}
+      className={cn('flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-600 transition-colors cursor-pointer',
+        active ? 'border-accent/40 text-accent' : 'border-input text-muted-foreground hover:text-foreground')}>
+      {icon}<span className="hidden sm:inline">{label}</span>
+    </button>
   )
 }
 
@@ -116,7 +167,6 @@ function SectionEditor({ section, def, onSaved }: {
       else { setSaved(true); onSaved(draft); setTimeout(() => setSaved(false), 2000) }
     })
   }
-
   function reset() {
     start(async () => {
       const r = await resetSectionConfig(section.key)
@@ -135,6 +185,9 @@ function SectionEditor({ section, def, onSaved }: {
         if (f.kind === 'textarea') {
           return <TextArea key={f.key} id={`${section.key}-${f.key}`} label={f.label} rows={3}
             value={String(draft[f.key] ?? '')} onChange={(v) => setField(f.key, v)} placeholder={f.placeholder} />
+        }
+        if (f.kind === 'toggle') {
+          return <Toggle key={f.key} label={f.label} checked={draft[f.key] !== false} onChange={(v) => setField(f.key, v)} />
         }
         // list
         const items = (Array.isArray(draft[f.key]) ? draft[f.key] : []) as Record<string, string>[]

@@ -47,6 +47,14 @@ const RENDERERS: Record<string, (c: SectionConfig, ctx: Ctx) => React.ReactNode>
 
 const str = (c: SectionConfig, k: string) => String(c[k] ?? '')
 
+// internal links keep SPA nav; external (http…) open in a new tab
+function SmartLink({ href, children }: { href: string; children: React.ReactNode }) {
+  if (/^https?:\/\//.test(href)) {
+    return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
+  }
+  return <Link href={href || '/'}>{children}</Link>
+}
+
 function renderHero(c: SectionConfig, { carModels }: Ctx) {
   return (
     <section className="relative overflow-hidden">
@@ -85,23 +93,25 @@ function renderHero(c: SectionConfig, { carModels }: Ctx) {
 
         <Reveal delay={0.24}>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/catalog">
+            <SmartLink href={str(c, 'ctaPrimaryHref') || '/catalog'}>
               <button className="group flex min-h-12 items-center gap-2 rounded-xl bg-accent px-6 text-sm font-700 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_28px_-4px_rgba(196,154,69,0.7)] cursor-pointer">
                 {str(c, 'ctaPrimary')}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </button>
-            </Link>
-            <Link href="/calculator">
-              <button className="flex min-h-12 items-center gap-2 rounded-xl border border-input bg-surface/60 px-6 text-sm font-600 backdrop-blur-md transition-colors hover:border-accent/40 cursor-pointer">
-                <Wrench className="h-4 w-4" />
-                {str(c, 'ctaSecondary')}
-              </button>
-            </Link>
+            </SmartLink>
+            {c.ctaSecondaryOn !== false && (
+              <SmartLink href={str(c, 'ctaSecondaryHref') || '/calculator'}>
+                <button className="flex min-h-12 items-center gap-2 rounded-xl border border-input bg-surface/60 px-6 text-sm font-600 backdrop-blur-md transition-colors hover:border-accent/40 cursor-pointer">
+                  <Wrench className="h-4 w-4" />
+                  {str(c, 'ctaSecondary')}
+                </button>
+              </SmartLink>
+            )}
           </div>
         </Reveal>
 
         {/* model chips */}
-        {carModels.length > 0 && (
+        {c.modelsOn !== false && carModels.length > 0 && (
           <Reveal delay={0.32}>
             <div className="mt-12 flex flex-wrap items-center gap-2">
               <span className="mr-1 text-xs font-500 uppercase tracking-widest text-muted-foreground">{str(c, 'modelsLabel')}</span>
