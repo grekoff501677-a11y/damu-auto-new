@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { GradientTracing } from '@/components/ui/gradient-tracing'
 import { cn } from '@/lib/utils'
@@ -16,40 +16,33 @@ const CIRCLE =
   ` A${R},${R} 0 1,1 ${SIZE / 2},${SIZE / 2 + R}` +
   ` A${R},${R} 0 1,1 ${SIZE / 2},${SIZE / 2 - R}`
 
-// зона выхватывания (снизу, где живёт пульс на 6 часах): длинная полутень,
-// гаснет ЗАДОЛГО до краёв блока — никаких квадратных обрезов
+// мягкий свет снизу (6 часов): длинная полутень, гаснет ЗАДОЛГО до краёв
+// блока — никаких квадратных обрезов свечения
 const SPOT =
-  'radial-gradient(circle at 50% 84%,' +
-  ' #000 0%, #000 20%, rgba(0,0,0,0.82) 33%, rgba(0,0,0,0.52) 45%,' +
-  ' rgba(0,0,0,0.24) 57%, rgba(0,0,0,0.07) 67%, transparent 76%)'
-
-// тёплое свечение от пульса — мягко освещает тень снизу (погашено рано)
-const GLOW =
-  'radial-gradient(circle at 50% 88%, rgba(244,226,180,0.20) 0%, rgba(231,201,132,0.08) 32%, transparent 58%)'
+  'radial-gradient(circle at 50% 86%,' +
+  ' #000 0%, #000 16%, rgba(0,0,0,0.8) 28%, rgba(0,0,0,0.5) 40%,' +
+  ' rgba(0,0,0,0.22) 52%, rgba(0,0,0,0.06) 62%, transparent 70%)'
 
 const LOGO_BOX = 'absolute inset-[12%] h-[76%] w-[76%] object-contain'
 
 export function HeroLogo({ className }: { className?: string }) {
   return (
     <div className={cn('relative aspect-square', className)}>
-      {/* эмблема в тени */}
+      {/* эмблема в лёгкой тени */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={LOGO} alt="Damu Auto" loading="lazy" decoding="async"
         className={LOGO_BOX}
-        style={{ filter: 'brightness(0.4) saturate(0.82)' }}
+        style={{ filter: 'brightness(0.45) saturate(0.85)' }}
       />
 
-      {/* тёплое освещение тени снизу */}
-      <div aria-hidden className="absolute inset-0" style={{ background: GLOW }} />
-
-      {/* свет мягко выхватывает эмблему из тени (нижняя часть) */}
+      {/* свет снизу выхватывает эмблему из тени */}
       <div aria-hidden className="absolute inset-0" style={{ WebkitMaskImage: SPOT, maskImage: SPOT }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={LOGO} alt="" aria-hidden loading="lazy" decoding="async"
           className={LOGO_BOX}
-          style={{ filter: 'brightness(1.4) drop-shadow(0 0 16px rgba(244,226,180,0.4))' }}
+          style={{ filter: 'brightness(1.2) drop-shadow(0 0 12px rgba(244,226,180,0.3))' }}
         />
       </div>
 
