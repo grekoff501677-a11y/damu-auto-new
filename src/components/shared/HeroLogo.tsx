@@ -16,34 +16,38 @@ const CIRCLE =
   ` A${R},${R} 0 1,1 ${SIZE / 2},${SIZE / 2 + R}` +
   ` A${R},${R} 0 1,1 ${SIZE / 2},${SIZE / 2 - R}`
 
+// мягкий свет снизу (6 часов): длинная полутень, гаснет ЗАДОЛГО до краёв
+// блока — никаких квадратных обрезов свечения
+const SPOT =
+  'radial-gradient(circle at 50% 86%,' +
+  ' #000 0%, #000 16%, rgba(0,0,0,0.8) 28%, rgba(0,0,0,0.5) 40%,' +
+  ' rgba(0,0,0,0.22) 52%, rgba(0,0,0,0.06) 62%, transparent 70%)'
+
+const LOGO_BOX = 'absolute inset-[12%] h-[76%] w-[76%] object-contain'
+
 export function HeroLogo({ className }: { className?: string }) {
   return (
     <div className={cn('relative aspect-square', className)}>
-      {/* ambient gold wash behind the emblem */}
-      <div
-        aria-hidden
-        className="absolute inset-0 rounded-full"
-        style={{ background: 'radial-gradient(circle, rgba(196,154,69,0.14) 0%, transparent 64%)' }}
-      />
-
-      {/* emblem, slightly shaded */}
+      {/* эмблема в лёгкой тени */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={LOGO} alt="Damu Auto" loading="lazy" decoding="async"
-        className="absolute inset-[12%] h-[76%] w-[76%] object-contain"
-        style={{ filter: 'brightness(0.9) drop-shadow(0 0 26px rgba(196,154,69,0.22))' }}
+        className={LOGO_BOX}
+        style={{ filter: 'brightness(0.45) saturate(0.85)' }}
       />
 
-      {/* gentle light from below — where the pulse lives */}
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{ background: 'radial-gradient(circle at 50% 92%, rgba(241,223,174,0.12) 0%, transparent 52%)' }}
-      />
+      {/* свет снизу выхватывает эмблему из тени */}
+      <div aria-hidden className="absolute inset-0" style={{ WebkitMaskImage: SPOT, maskImage: SPOT }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={LOGO} alt="" aria-hidden loading="lazy" decoding="async"
+          className={LOGO_BOX}
+          style={{ filter: 'brightness(1.2) drop-shadow(0 0 12px rgba(244,226,180,0.3))' }}
+        />
+      </div>
 
-      {/* gold gradient pulse tracing the circle; rotated 90° so the light
-          sits at 6 o'clock instead of the side; no static track */}
-      <div className="absolute inset-0" aria-hidden style={{ transform: 'rotate(90deg)' }}>
+      {/* золотой пульс по кольцу; −90° → свет живёт на 6 часах (внизу) */}
+      <div className="absolute inset-0" aria-hidden style={{ transform: 'rotate(-90deg)' }}>
         <GradientTracing
           responsive
           width={SIZE}
@@ -51,7 +55,7 @@ export function HeroLogo({ className }: { className?: string }) {
           strokeWidth={2.5}
           baseColor="transparent"
           gradientColors={['#F1DFAE', '#E7C984', '#C49A45']}
-          animationDuration={3.2}
+          animationDuration={4}
           path={CIRCLE}
         />
       </div>
