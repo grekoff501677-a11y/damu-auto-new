@@ -103,6 +103,9 @@ type RuleRow = {
   interval_km: number | null
   interval_months: number | null
   spec_hint: string | null
+  // linked catalog product (via product_id); PostgREST returns an object for
+  // many-to-one embeds, but the client's inferred type is an array — allow both
+  products?: { kaspi_url: string | null } | { kaspi_url: string | null }[] | null
 }
 
 function buildMilestones(rules: RuleRow[]): PublicMilestone[] {
@@ -114,13 +117,16 @@ function buildMilestones(rules: RuleRow[]): PublicMilestone[] {
   for (let km = STEP; km <= maxKm; km += STEP) {
     const parts = kmRules
       .filter((r) => km % (r.interval_km as number) === 0)
-      .map<PublicPart>((r) => ({
-        name: r.product_name,
-        type: r.rule_type,
-        spec: r.spec_hint ?? '',
-        node: inferNode(r.product_name),
-        kaspiUrl: KASPI_FALLBACK,
-      }))
+      .map<PublicPart>((r) => {
+        const linked = Array.isArray(r.products) ? r.products[0] : r.products
+        return {
+          name: r.product_name,
+          type: r.rule_type,
+          spec: r.spec_hint ?? '',
+          node: inferNode(r.product_name),
+          kaspiUrl: linked?.kaspi_url || KASPI_FALLBACK,
+        }
+      })
     if (parts.length) out.push({ km, months: Math.round((km / STEP) * 6), parts })
   }
   return out
@@ -130,7 +136,7 @@ export async function getMaintenanceModels(): Promise<PublicMaintModel[]> {
   const supabase = await createClient()
   const [{ data: models }, { data: rules }] = await Promise.all([
     supabase.from('car_models').select('*').eq('is_active', true).order('sort_order'),
-    supabase.from('maintenance_rules').select('car_model_id, product_name, rule_type, interval_km, interval_months, spec_hint'),
+    supabase.from('maintenance_rules').select('car_model_id, product_name, rule_type, interval_km, interval_months, spec_hint, products(kaspi_url)'),
   ])
 
   const byModel = new Map<string, RuleRow[]>()
@@ -143,10 +149,9 @@ export async function getMaintenanceModels(): Promise<PublicMaintModel[]> {
   return ((models ?? []) as CarModel[]).map((m) => {
     // DB blueprint takes precedence; fall back to the code config.
     const dbHotspots = Array.isArray(m.blueprint_nodes) ? m.blueprint_nodes : []
-    const blueprint: BlueprintData | undefined =
-      m.blueprint_url && dbHotspots.length >= 0
-        ? { image: m.blueprint_url, hotspots: dbHotspots }
-        : getBlueprint(m.slug)
+    const blueprint: BlueprintData | undefined = m.blueprint_url
+      ? { image: m.blueprint_url, hotspots: dbHotspots }
+      : getBlueprint(m.slug)
     return {
       slug: m.slug,
       brand: m.brand,

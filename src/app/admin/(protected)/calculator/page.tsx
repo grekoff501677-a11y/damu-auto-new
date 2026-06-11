@@ -4,7 +4,9 @@ import { AdminHeader } from '@/components/admin/AdminHeader'
 import { AddRuleForm } from './AddRuleForm'
 import { DeleteRuleButton } from './DeleteRuleButton'
 import { cn } from '@/lib/utils'
-import type { CarModel, MaintenanceRule } from '@/lib/types'
+import type { CarModel, MaintenanceRule, Product } from '@/lib/types'
+
+type RuleRow = MaintenanceRule & { product: Pick<Product, 'name'> | Pick<Product, 'name'>[] | null }
 
 export const metadata = { title: 'Калькулятор ТО · Админ' }
 
@@ -12,16 +14,20 @@ export default async function AdminCalculatorPage({ searchParams }: { searchPara
   const { model } = await searchParams
   const supabase = await createClient()
 
-  const { data: modelsData } = await supabase.from('car_models').select('*').order('sort_order')
+  const [{ data: modelsData }, { data: productsData }] = await Promise.all([
+    supabase.from('car_models').select('*').order('sort_order'),
+    supabase.from('products').select('id, name').order('name'),
+  ])
   const models = (modelsData ?? []) as CarModel[]
+  const products = (productsData ?? []) as Pick<Product, 'id' | 'name'>[]
   const active = models.find((m) => m.slug === model) ?? models[0]
 
-  let rules: MaintenanceRule[] = []
+  let rules: RuleRow[] = []
   if (active) {
-    const { data } = await supabase.from('maintenance_rules').select('*')
+    const { data } = await supabase.from('maintenance_rules').select('*, product:products(name)')
       .eq('car_model_id', active.id)
       .order('interval_km', { ascending: true })
-    rules = (data ?? []) as MaintenanceRule[]
+    rules = (data ?? []) as RuleRow[]
   }
 
   return (
@@ -39,7 +45,7 @@ export default async function AdminCalculatorPage({ searchParams }: { searchPara
         ))}
       </div>
 
-      {active && <AddRuleForm carModelId={active.id} />}
+      {active && <AddRuleForm carModelId={active.id} products={products} />}
 
       {/* Rules list */}
       <div className="glass mt-4 overflow-hidden rounded-2xl">
@@ -53,11 +59,14 @@ export default async function AdminCalculatorPage({ searchParams }: { searchPara
                 <th className="p-3 font-500">Тип</th>
                 <th className="p-3 font-500">Интервал</th>
                 <th className="p-3 font-500">Спецификация</th>
+                <th className="p-3 font-500">Товар</th>
                 <th className="p-3 font-500"></th>
               </tr>
             </thead>
             <tbody>
-              {rules.map((r) => (
+              {rules.map((r) => {
+                const linked = Array.isArray(r.product) ? r.product[0] : r.product
+                return (
                 <tr key={r.id} className="border-b border-glass-border last:border-0">
                   <td className="p-3 font-600 text-foreground">{r.product_name}</td>
                   <td className="p-3">
@@ -72,9 +81,11 @@ export default async function AdminCalculatorPage({ searchParams }: { searchPara
                     {r.interval_months ? `${r.interval_months} мес` : ''}
                   </td>
                   <td className="p-3 text-muted-foreground">{r.spec_hint || '—'}</td>
+                  <td className="p-3 text-muted-foreground">{linked?.name || '—'}</td>
                   <td className="p-3 text-right"><DeleteRuleButton id={r.id} /></td>
                 </tr>
-              ))}
+                )
+              })}
             </tbody>
           </table>
         )}

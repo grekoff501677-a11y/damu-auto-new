@@ -2,15 +2,17 @@
 
 import { useState, useTransition } from 'react'
 import { Plus, Loader2 } from 'lucide-react'
+import { SelectField } from '@/components/admin/AdminField'
 import { addRule } from './actions'
 import { cn } from '@/lib/utils'
+import type { Product } from '@/lib/types'
 
-export function AddRuleForm({ carModelId }: { carModelId: string }) {
+export function AddRuleForm({ carModelId, products }: { carModelId: string; products: Pick<Product, 'id' | 'name'>[] }) {
   const [pending, start] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [f, setF] = useState({
     product_name: '', rule_type: 'replace' as 'replace' | 'inspect',
-    interval_km: '', interval_months: '', spec_hint: '',
+    interval_km: '', interval_months: '', spec_hint: '', product_id: '',
   })
 
   function set<K extends keyof typeof f>(k: K, v: (typeof f)[K]) { setF((p) => ({ ...p, [k]: v })) }
@@ -20,6 +22,7 @@ export function AddRuleForm({ carModelId }: { carModelId: string }) {
     start(async () => {
       const r = await addRule({
         car_model_id: carModelId,
+        product_id: f.product_id || null,
         product_name: f.product_name,
         rule_type: f.rule_type,
         interval_km: f.interval_km ? parseInt(f.interval_km, 10) : null,
@@ -28,7 +31,7 @@ export function AddRuleForm({ carModelId }: { carModelId: string }) {
         sort_order: 0,
       })
       if (r?.error) setError(r.error)
-      else setF({ product_name: '', rule_type: 'replace', interval_km: '', interval_months: '', spec_hint: '' })
+      else setF({ product_name: '', rule_type: 'replace', interval_km: '', interval_months: '', spec_hint: '', product_id: '' })
     })
   }
 
@@ -46,6 +49,11 @@ export function AddRuleForm({ carModelId }: { carModelId: string }) {
         <input className={inp} type="number" placeholder="км" value={f.interval_km} onChange={(e) => set('interval_km', e.target.value)} />
         <input className={inp} type="number" placeholder="мес" value={f.interval_months} onChange={(e) => set('interval_months', e.target.value)} />
         <input className={inp} placeholder="спец. (5W-30)" value={f.spec_hint} onChange={(e) => set('spec_hint', e.target.value)} />
+      </div>
+      <div className="mt-3 sm:max-w-md">
+        <SelectField label="Связанный товар (необязательно)" id="rule-product" value={f.product_id}
+          onChange={(v) => set('product_id', v)}
+          options={[{ value: '', label: '— без привязки —' }, ...products.map((p) => ({ value: p.id, label: p.name }))]} />
       </div>
       {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
       <button onClick={submit} disabled={pending}

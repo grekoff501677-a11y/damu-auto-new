@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { LogOut } from 'lucide-react'
+import { logout } from './actions'
 
 export default async function ProtectedAdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -19,7 +20,7 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
         </Link>
         <div className="flex items-center gap-3">
           <span className="hidden text-xs text-muted-foreground sm:inline">{user.email}</span>
-          <form action="/api/auth/logout" method="POST">
+          <form action={logout}>
             <button className="flex min-h-9 items-center gap-2 rounded-lg border border-input px-3 text-xs font-600 text-muted-foreground transition-colors hover:border-accent/40 hover:text-foreground cursor-pointer">
               <LogOut className="h-3.5 w-3.5" />
               Выйти

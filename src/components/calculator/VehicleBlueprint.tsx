@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { cn } from '@/lib/utils'
+import { cn, leaderLinePath } from '@/lib/utils'
 import type { BlueprintHotspot } from '@/lib/types'
 
 export type BodyNode = 'engine' | 'cabin' | 'brakes' | 'transmission' | 'cooling'
@@ -32,20 +32,15 @@ export function VehicleBlueprint({ active, className, blueprint }: Props) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={blueprint.image} alt="Схема автомобиля" loading="lazy" decoding="async" className="relative block h-auto w-full" />
 
-        {/* leader lines (straight or curved) */}
+        {/* leader lines (straight, curved or elbow) */}
         {lines.length > 0 && (
           <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             {lines.map((h) => {
               const on = !!h.bodyNode && active.includes(h.bodyNode)
               const stroke = on ? '#9FE0FF' : 'rgba(196,154,69,0.55)'
-              const l = h.line!
-              const curved = l.cx != null && l.cy != null
-              return curved ? (
-                <path key={h.id} d={`M ${h.x} ${h.y} Q ${l.cx} ${l.cy} ${l.x2} ${l.y2}`}
-                  fill="none" stroke={stroke} strokeWidth={1} vectorEffect="non-scaling-stroke" strokeLinecap="round" />
-              ) : (
-                <line key={h.id} x1={h.x} y1={h.y} x2={l.x2} y2={l.y2}
-                  stroke={stroke} strokeWidth={1} vectorEffect="non-scaling-stroke" strokeLinecap="round" />
+              return (
+                <path key={h.id} d={leaderLinePath(h)!} fill="none" stroke={stroke} strokeWidth={1}
+                  vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />
               )
             })}
           </svg>

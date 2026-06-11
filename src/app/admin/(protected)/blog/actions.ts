@@ -33,6 +33,15 @@ export async function saveBlogPost(input: BlogInput) {
     return { error: 'Заполните заголовок и текст статьи' }
   }
 
+  // published_at fixes the FIRST publication date: editing an already
+  // published post must not bump it (blog sorts by published_at desc)
+  let publishedAt: string | null = input.published ? new Date().toISOString() : null
+  if (input.id && input.published) {
+    const { data: existing } = await supabase
+      .from('blog_posts').select('published_at').eq('id', input.id).single()
+    if (existing?.published_at) publishedAt = existing.published_at
+  }
+
   const row = {
     title: input.title.trim(),
     slug: input.slug.trim() || slugify(input.title),
@@ -45,7 +54,7 @@ export async function saveBlogPost(input: BlogInput) {
     before_label: input.before_label.trim() || 'Оригинал',
     after_label: input.after_label.trim() || 'Подделка',
     published: input.published,
-    published_at: input.published ? new Date().toISOString() : null,
+    published_at: publishedAt,
   }
 
   if (input.id) {

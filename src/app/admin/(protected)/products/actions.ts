@@ -58,11 +58,14 @@ export async function saveProduct(input: ProductInput) {
 
   // rewrite compatibility
   if (productId) {
-    await supabase.from('product_compatibility').delete().eq('product_id', productId)
+    const { error: delError } = await supabase
+      .from('product_compatibility').delete().eq('product_id', productId)
+    if (delError) return { error: `Совместимость не сохранена: ${delError.message}` }
     if (input.compatibility.length) {
-      await supabase.from('product_compatibility').insert(
+      const { error: insError } = await supabase.from('product_compatibility').insert(
         input.compatibility.map((car_model_id) => ({ product_id: productId, car_model_id }))
       )
+      if (insError) return { error: `Совместимость не сохранена: ${insError.message}` }
     }
   }
 

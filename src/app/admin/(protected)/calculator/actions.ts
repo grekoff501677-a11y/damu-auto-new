@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 
 export type RuleInput = {
   car_model_id: string
+  product_id: string | null
   product_name: string
   rule_type: 'replace' | 'inspect'
   interval_km: number | null
@@ -18,6 +19,7 @@ export async function addRule(input: RuleInput) {
   if (!input.product_name.trim()) return { error: 'Укажите название детали' }
   const { error } = await supabase.from('maintenance_rules').insert({
     car_model_id: input.car_model_id,
+    product_id: input.product_id,
     product_name: input.product_name.trim(),
     rule_type: input.rule_type,
     interval_km: input.interval_km,

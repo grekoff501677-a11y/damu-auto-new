@@ -13,8 +13,10 @@ export type BlueprintHotspot = {
   bodyNode?: BodyNode
   label?: string
   /** optional leader line drawn from the dot to (x2,y2); label sits at the end.
-   *  cx/cy = optional quadratic-bezier control point → curved line. */
-  line?: { x2: number; y2: number; cx?: number; cy?: number }
+   *  cx/cy = optional middle point: quadratic-bezier control for 'curve'
+   *  (default when kind is omitted — legacy data), polyline corner for 'elbow'
+   *  (technical-drawing callout: angled segment + bend). */
+  line?: { x2: number; y2: number; cx?: number; cy?: number; kind?: 'curve' | 'elbow' }
 }
 
 export type CarModel = {

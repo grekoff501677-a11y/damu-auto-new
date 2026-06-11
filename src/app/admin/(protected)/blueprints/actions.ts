@@ -19,7 +19,11 @@ export async function saveBlueprint(modelId: string, url: string, hotspots: Blue
           x2: clamp(h.line.x2),
           y2: clamp(h.line.y2),
           ...(h.line.cx != null && h.line.cy != null
-            ? { cx: clamp(h.line.cx), cy: clamp(h.line.cy) }
+            ? {
+                cx: clamp(h.line.cx),
+                cy: clamp(h.line.cy),
+                ...(h.line.kind === 'elbow' || h.line.kind === 'curve' ? { kind: h.line.kind } : {}),
+              }
             : {}),
         }
       : undefined,

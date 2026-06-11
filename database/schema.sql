@@ -170,12 +170,22 @@ CREATE POLICY "public_read_blog"        ON blog_posts          FOR SELECT USING 
 CREATE POLICY "public_read_blog_prods"  ON blog_post_products  FOR SELECT USING (TRUE);
 CREATE POLICY "public_read_maintenance" ON maintenance_rules   FOR SELECT USING (TRUE);
 
--- Leads: insert-only for anon (form submission), full access for admin
-CREATE POLICY "anon_insert_leads" ON leads FOR INSERT WITH CHECK (TRUE);
-CREATE POLICY "admin_all_leads"   ON leads USING (auth.role() = 'authenticated');
+-- Leads: NO anon insert policy — the only write path is /api/leads, which
+-- uses the service-role client (bypasses RLS) and enforces validation,
+-- rate-limit and RK consent. Admin reads/manages via authenticated session.
+CREATE POLICY "admin_all_leads" ON leads
+  USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
 -- Admin full access (authenticated users)
-CREATE POLICY "admin_all_products"   ON products          USING (auth.role() = 'authenticated');
-CREATE POLICY "admin_all_car_models" ON car_models        USING (auth.role() = 'authenticated');
-CREATE POLICY "admin_all_blog"       ON blog_posts        USING (auth.role() = 'authenticated');
-CREATE POLICY "admin_all_maint"      ON maintenance_rules USING (auth.role() = 'authenticated');
+CREATE POLICY "admin_all_products"   ON products
+  USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "admin_all_car_models" ON car_models
+  USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "admin_all_blog"       ON blog_posts
+  USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "admin_all_maint"      ON maintenance_rules
+  USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "admin_all_compat"     ON product_compatibility
+  USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "admin_all_blog_prods" ON blog_post_products
+  USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');

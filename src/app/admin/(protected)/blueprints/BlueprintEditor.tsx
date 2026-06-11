@@ -1,9 +1,9 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
-import { Plus, Trash2, Save, Loader2, Check, Spline, Eye, EyeOff } from 'lucide-react'
+import { Plus, Trash2, Save, Loader2, Check, Spline, Eye, EyeOff, Minus, CornerUpRight } from 'lucide-react'
 import { saveBlueprint } from './actions'
-import { cn } from '@/lib/utils'
+import { cn, leaderLinePath } from '@/lib/utils'
 import type { BlueprintHotspot, BodyNode } from '@/lib/types'
 
 const BODY_NODES: { value: BodyNode | ''; label: string }[] = [
@@ -74,17 +74,18 @@ export function BlueprintEditor({
     else patch(drag.id, { line: { ...h.line, cx: x, cy: y } })
   }
 
-  function toggleCurve(h: BlueprintHotspot) {
+  function setLineKind(h: BlueprintHotspot, kind: 'straight' | 'curve' | 'elbow') {
     if (!h.line) return
-    if (h.line.cx != null) {
-      const { x2, y2 } = h.line
-      patch(h.id, { line: { x2, y2 } }) // back to straight
-    } else {
-      // control point at the midpoint, nudged perpendicular for a visible bend
-      const mx = (h.x + h.line.x2) / 2
-      const my = (h.y + h.line.y2) / 2
-      patch(h.id, { line: { ...h.line, cx: clampPct(mx + 8), cy: clampPct(my - 8) } })
-    }
+    const { x2, y2, cx, cy } = h.line
+    if (kind === 'straight') { patch(h.id, { line: { x2, y2 } }); return }
+    // keep an already placed middle point when switching curve ↔ elbow
+    const defaults = kind === 'elbow'
+      // technical-drawing callout: angled segment from the dot, then a
+      // horizontal run into the label → corner shares y with the endpoint
+      ? { cx: clampPct(h.x + (x2 - h.x) * 0.45), cy: y2 }
+      // bezier control at the midpoint, nudged for a visible bend
+      : { cx: clampPct((h.x + x2) / 2 + 8), cy: clampPct((h.y + y2) / 2 - 8) }
+    patch(h.id, { line: { x2, y2, cx: cx ?? defaults.cx, cy: cy ?? defaults.cy, kind } })
   }
 
   function remove(id: string) {
@@ -132,15 +133,13 @@ export function BlueprintEditor({
             ? <img src={url} alt="" className="pointer-events-none relative block h-auto w-full" />
             : <div className="grid h-[280px] place-items-center text-sm text-muted-foreground">Вставьте URL изображения выше</div>}
 
-          {/* leader lines (straight or curved) */}
+          {/* leader lines (straight, curved or elbow) */}
           <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             {hotspots.filter((h) => h.line).map((h) => {
               const on = preview && !!h.bodyNode
-              const l = h.line!
               const stroke = on ? '#9FE0FF' : 'rgba(196,154,69,0.6)'
-              return l.cx != null && l.cy != null
-                ? <path key={h.id} d={`M ${h.x} ${h.y} Q ${l.cx} ${l.cy} ${l.x2} ${l.y2}`} fill="none" stroke={stroke} strokeWidth={1} vectorEffect="non-scaling-stroke" />
-                : <line key={h.id} x1={h.x} y1={h.y} x2={l.x2} y2={l.y2} stroke={stroke} strokeWidth={1} vectorEffect="non-scaling-stroke" />
+              return <path key={h.id} d={leaderLinePath(h)!} fill="none" stroke={stroke} strokeWidth={1}
+                vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />
             })}
           </svg>
 
@@ -186,7 +185,7 @@ export function BlueprintEditor({
                     onPointerDown={(e) => { e.stopPropagation(); setSelected(h.id); setDrag({ id: h.id, kind: 'ctrl' }) }}
                     className="absolute -translate-x-1/2 -translate-y-1/2 cursor-grab"
                     style={{ left: `${h.line.cx}%`, top: `${h.line.cy}%` }}
-                    title="Точка изгиба"
+                    title={h.line.kind === 'elbow' ? 'Угол излома' : 'Точка изгиба'}
                   >
                     <span className="block rotate-45 bg-amber-300" style={{ width: 9, height: 9, boxShadow: '0 0 0 2px #061521' }} />
                   </button>
@@ -205,7 +204,7 @@ export function BlueprintEditor({
         </div>
 
         <p className="mt-2 text-xs text-muted-foreground">
-          Клик по схеме — добавить точку. Тяните точку, чтобы переместить. Линию и подпись настройте справа.
+          Клик по схеме — добавить точку. Тяните точку — переместить; синий квадрат — конец выноски; жёлтый ромб — точка изгиба или угол излома.
         </p>
       </div>
 
@@ -261,15 +260,33 @@ export function BlueprintEditor({
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
-            {sel.line && (
-              <button onClick={() => toggleCurve(sel)}
-                className={cn('flex min-h-10 w-full items-center justify-center gap-1.5 rounded-lg border text-sm font-600 cursor-pointer',
-                  sel.line.cx != null ? 'border-amber-300/40 text-amber-300' : 'border-input text-muted-foreground hover:border-accent/40')}>
-                <Spline className="h-4 w-4" /> {sel.line.cx != null ? 'Сделать прямой' : 'Изогнуть линию'}
-              </button>
-            )}
+            {sel.line && (() => {
+              const kind = sel.line.cx == null ? 'straight' : sel.line.kind === 'elbow' ? 'elbow' : 'curve'
+              const opts = [
+                { k: 'straight' as const, label: 'Прямая', Icon: Minus },
+                { k: 'curve' as const,    label: 'Изгиб',  Icon: Spline },
+                { k: 'elbow' as const,    label: 'Излом',  Icon: CornerUpRight },
+              ]
+              return (
+                <div>
+                  <label className="mb-1 block text-[11px] font-600 text-muted-foreground">Стиль линии</label>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {opts.map(({ k, label, Icon }) => (
+                      <button key={k} onClick={() => setLineKind(sel, k)}
+                        className={cn('flex min-h-9 items-center justify-center gap-1 rounded-lg border text-xs font-600 cursor-pointer',
+                          kind === k ? 'border-amber-300/40 bg-amber-300/10 text-amber-300' : 'border-input text-muted-foreground hover:border-accent/40')}>
+                        <Icon className="h-3.5 w-3.5" /> {label}
+                      </button>
+                    ))}
+                  </div>
+                  {kind !== 'straight' && (
+                    <p className="mt-1 text-[11px] text-muted-foreground">Тяните жёлтый ромб на схеме — {kind === 'elbow' ? 'это угол излома' : 'это точка изгиба'}.</p>
+                  )}
+                </div>
+              )
+            })()}
             <p className="text-[11px] text-muted-foreground">
-              X {sel.x}% · Y {sel.y}%{sel.line ? ` · линия → ${sel.line.x2}/${sel.line.y2}${sel.line.cx != null ? ' · кривая' : ''}` : ''}
+              X {sel.x}% · Y {sel.y}%{sel.line ? ` · линия → ${sel.line.x2}/${sel.line.y2}${sel.line.cx == null ? '' : sel.line.kind === 'elbow' ? ' · излом' : ' · изгиб'}` : ''}
             </p>
           </div>
         )}

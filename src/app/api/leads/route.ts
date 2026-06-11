@@ -1,3 +1,4 @@
+import { createHmac } from 'node:crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { LeadFormData } from '@/lib/types'
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
     const { error } = await supabase.from('leads').insert({
       name, phone, message, car_model: carModel, source,
       metadata: {
-        ...(typeof body.metadata === 'object' && body.metadata ? body.metadata : {}),
+        ...pickMetadata(body.metadata),
         consent: true,
         consent_at: new Date().toISOString(),
         ip_hash: hashIp(ip),
@@ -102,9 +103,24 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// lightweight non-reversible IP fingerprint for abuse auditing (raw IP not stored)
+// client metadata is untrusted: keep only known keys, clamp each value
+// (otherwise arbitrary multi-MB JSON would land in jsonb via service role)
+const METADATA_KEYS = ['page', 'referrer', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'] as const
+
+function pickMetadata(raw: unknown): Record<string, string> {
+  if (typeof raw !== 'object' || !raw) return {}
+  const out: Record<string, string> = {}
+  for (const key of METADATA_KEYS) {
+    const v = clean((raw as Record<string, unknown>)[key], 300)
+    if (v) out[key] = v
+  }
+  return out
+}
+
+// keyed non-reversible IP fingerprint for abuse auditing (raw IP not stored —
+// RK compliance). HMAC, not plain hash: IPv4 space is brute-forceable.
+const IP_HASH_KEY = process.env.LEAD_IP_HASH_SALT || process.env.SUPABASE_SERVICE_ROLE_KEY || 'damu-auto'
+
 function hashIp(ip: string): string {
-  let h = 0
-  for (let i = 0; i < ip.length; i++) { h = (h << 5) - h + ip.charCodeAt(i); h |= 0 }
-  return `ip_${(h >>> 0).toString(36)}`
+  return `ip_${createHmac('sha256', IP_HASH_KEY).update(ip).digest('hex').slice(0, 24)}`
 }
