@@ -11,6 +11,7 @@ import type { PublicMaintModel } from '@/lib/queries'
 import type { SectionConfig } from '@/lib/page-sections'
 import type { CarModel } from '@/lib/types'
 import { TEXTURE_ORIGINAL_FILTER, TEXTURE_FAKE_FILTER } from '@/lib/textures'
+import { cn } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,20 +30,23 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col">
       {sections.map((s) => {
-        const render = RENDERERS[s.key]
-        return render ? <Fragment key={s.key}>{render(s.config, ctx)}</Fragment> : null
+        const render = RENDERERS[s.type]
+        return render ? <Fragment key={s.id ?? s.type}>{render(s.config, ctx)}</Fragment> : null
       })}
     </div>
   )
 }
 
-// ── section renderers (keyed by section_key) ──
+// ── block renderers (keyed by block type) ──
 const RENDERERS: Record<string, (c: SectionConfig, ctx: Ctx) => React.ReactNode> = {
   hero: renderHero,
   features: renderFeatures,
   maintenance: renderMaintenance,
   originality: renderOriginality,
   lead_form: renderLeadForm,
+  text: renderText,
+  banner: renderBanner,
+  divider: renderDivider,
 }
 
 const str = (c: SectionConfig, k: string) => String(c[k] ?? '')
@@ -185,12 +189,12 @@ function renderOriginality(c: SectionConfig) {
         </Reveal>
         <Reveal delay={0.16}>
           <div className="mt-8 text-center">
-            <Link href="/blog">
+            <SmartLink href={str(c, 'ctaHref') || '/blog'}>
               <button className="inline-flex items-center gap-2 rounded-xl border border-input bg-surface/60 px-6 py-3 text-sm font-600 backdrop-blur-md transition-colors hover:border-accent/40 cursor-pointer">
                 {str(c, 'ctaLabel')}
                 <ArrowRight className="h-4 w-4" />
               </button>
-            </Link>
+            </SmartLink>
           </div>
         </Reveal>
       </div>
@@ -210,6 +214,62 @@ function renderLeadForm(c: SectionConfig) {
         </Reveal>
       </div>
     </section>
+  )
+}
+
+// ── library blocks ──
+function renderText(c: SectionConfig) {
+  const centered = c.centered === true
+  return (
+    <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 md:py-12">
+      <Reveal>
+        <div className={cn('max-w-2xl', centered && 'mx-auto text-center')}>
+          {str(c, 'kicker') && <p className="text-xs font-600 uppercase tracking-widest text-accent">{str(c, 'kicker')}</p>}
+          {str(c, 'title') && <h2 className="mt-2 font-heading text-3xl font-700 leading-tight md:text-4xl">{str(c, 'title')}</h2>}
+          {str(c, 'body') && <p className="mt-3 whitespace-pre-line leading-relaxed text-muted-foreground">{str(c, 'body')}</p>}
+        </div>
+      </Reveal>
+    </section>
+  )
+}
+
+function renderBanner(c: SectionConfig) {
+  return (
+    <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 md:py-12">
+      <Reveal>
+        <div className="glass flex flex-col items-center gap-5 overflow-hidden rounded-3xl border border-accent/20 bg-accent/[0.06] p-8 text-center md:flex-row md:justify-between md:p-10 md:text-left">
+          <div>
+            <h2 className="font-heading text-2xl font-700 leading-tight md:text-3xl">{str(c, 'title')}</h2>
+            {str(c, 'subtitle') && <p className="mt-2 max-w-xl text-muted-foreground leading-relaxed">{str(c, 'subtitle')}</p>}
+          </div>
+          {c.buttonOn !== false && str(c, 'buttonLabel') && (
+            <SmartLink href={str(c, 'buttonHref') || '/'}>
+              <button className="group flex min-h-12 shrink-0 items-center gap-2 rounded-xl bg-accent px-6 text-sm font-700 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_28px_-4px_rgba(196,154,69,0.7)] cursor-pointer">
+                {str(c, 'buttonLabel')}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </button>
+            </SmartLink>
+          )}
+        </div>
+      </Reveal>
+    </section>
+  )
+}
+
+function renderDivider(c: SectionConfig) {
+  const label = str(c, 'label')
+  return (
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+      {label ? (
+        <div className="flex items-center gap-4">
+          <span className="h-px flex-1 bg-gradient-to-r from-transparent to-accent/40" />
+          <span className="text-xs font-600 uppercase tracking-widest text-muted-foreground">{label}</span>
+          <span className="h-px flex-1 bg-gradient-to-l from-transparent to-accent/40" />
+        </div>
+      ) : (
+        <span className="mx-auto block h-px max-w-xs bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
+      )}
+    </div>
   )
 }
 

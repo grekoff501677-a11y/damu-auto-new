@@ -195,15 +195,17 @@ CREATE POLICY "admin_all_blog_prods" ON blog_post_products
 -- ============================================================
 -- Per-section order / visibility / editable texts for the home page.
 -- section_key values are fixed in code (src/lib/page-sections.ts).
+-- section_key holds the block TYPE (may repeat for library blocks);
+-- each row identified by id. is_system marks the 5 coded sections.
 CREATE TABLE page_sections (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   page         TEXT NOT NULL DEFAULT 'home',
   section_key  TEXT NOT NULL,
+  is_system    BOOLEAN NOT NULL DEFAULT FALSE,
   sort_order   SMALLINT NOT NULL DEFAULT 0,
   is_visible   BOOLEAN NOT NULL DEFAULT TRUE,
   config       JSONB NOT NULL DEFAULT '{}',
-  updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE (page, section_key)
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 ALTER TABLE page_sections ENABLE ROW LEVEL SECURITY;
@@ -215,10 +217,9 @@ CREATE TRIGGER page_sections_updated_at
   BEFORE UPDATE ON page_sections
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
-INSERT INTO page_sections (page, section_key, sort_order, is_visible) VALUES
-  ('home', 'hero',        1, TRUE),
-  ('home', 'features',    2, TRUE),
-  ('home', 'maintenance', 3, TRUE),
-  ('home', 'originality', 4, TRUE),
-  ('home', 'lead_form',   5, TRUE)
-ON CONFLICT (page, section_key) DO NOTHING;
+INSERT INTO page_sections (page, section_key, is_system, sort_order, is_visible) VALUES
+  ('home', 'hero',        TRUE, 1, TRUE),
+  ('home', 'features',    TRUE, 2, TRUE),
+  ('home', 'maintenance', TRUE, 3, TRUE),
+  ('home', 'originality', TRUE, 4, TRUE),
+  ('home', 'lead_form',   TRUE, 5, TRUE);
