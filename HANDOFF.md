@@ -111,8 +111,8 @@ scripts/
 
 ### Как добавить 3D-модель новой машины (процесс)
 Рендерится **только геометрия** (wireframe) — текстуры/материалы не нужны, можно выбрасывать.
-- **Если исходник GLB:** `npx @gltf-transform/cli optimize in.glb out.glb --compress draco --texture-compress webp` (optimize включает simplify — для wireframe незаметно). Coolray: 59 МБ → 2.5 МБ.
-- **Если исходник FBX** (`.max` бесполезны — нативный 3ds Max, не конвертируются без него; папка `maps` не нужна): сначала FBX→GLB через `fbx2gltf` (npm-пакет, API: `import convert from 'fbx2gltf'; await convert(src, dst, ['--binary'])`), затем выбросить текстуры (`scripts/strip-textures.mjs`) и `gltf-transform optimize … --compress draco`. Monjaro: 67 МБ FBX → 32 МБ GLB → **0.98 МБ**.
+- **Если исходник GLB:** `npx @gltf-transform/cli optimize in.glb out.glb --compress draco --texture-compress webp` (optimize включает simplify — для wireframe незаметно).
+- **Если исходник FBX** (`.max` бесполезны — нативный 3ds Max, не конвертируются без него; текстуры/`maps` не нужны; при выборе из нескольких FBX берём НЕ highPoly — обычный даёт чище сетку): сначала FBX→GLB через `fbx2gltf` (npm-пакет, API: `import convert from 'fbx2gltf'; await convert(src, dst, ['--binary'])`), затем выбросить текстуры (`scripts/strip-textures.mjs`) и `gltf-transform optimize … --compress draco`. Примеры: Monjaro 67 МБ FBX → **0.98 МБ**; Coolray 19 МБ FBX → **1.4 МБ**. Обе в Supabase Storage (бакет `models`).
 1. Залить на CDN: Cloudinary (raw/image upload, CORS `*`) либо Supabase Storage (`node scripts/upload-3d.mjs <файл> <имя.glb>` → публичный URL).
 2. Прописать URL: `UPDATE car_models SET model_3d_url = '...' WHERE slug = '...'`. Центр ТО сам покажет wireframe; ориентация нормализуется автоматически.
 
@@ -150,7 +150,7 @@ scripts/
 5. SQL Editor → выполнить **`database/migrations/003_rls_security_fixes.sql`** — админ-политики записи для `product_compatibility`/`blog_post_products` + удаление anon-INSERT в `leads`. (В свежем `schema.sql` это уже учтено, но на существующей БД миграция обязательна — иначе совместимость товаров не сохраняется.)
 5a. SQL Editor → выполнить **`database/migrations/004_blueprints_all_models.sql`** — схемы (Cloudinary SVG) + по 5 хотспотов для Atlas/Coolray/Okavango. Позиции выверены по реальной отрисовке узлов на каждой схеме; точную подгонку делать в `/admin/blueprints`.
 5b. SQL Editor → выполнить **`database/migrations/005_page_sections.sql`**, затем **`database/migrations/006_page_blocks.sql`** — таблица `page_sections` + сид 5 секций (005), затем `is_system`/снятие UNIQUE для добавляемых блоков (006). Без 005 конструктор не сохраняет; без 006 не работает добавление блоков (`ensureSystemBlocks` обращается к колонке `is_system`). В свежем `schema.sql` уже всё учтено.
-5c. SQL Editor → выполнить **`database/migrations/007_car_3d_model.sql`** — колонка `car_models.model_3d_url` + GLB-ссылки Coolray (Cloudinary) и Monjaro (Supabase Storage). Без неё эти модели покажут обычную 2D-схему (не сломано), 3D-wireframe не появится.
+5c. SQL Editor → выполнить **`database/migrations/007_car_3d_model.sql`** — колонка `car_models.model_3d_url` + GLB-ссылки Coolray и Monjaro (обе в Supabase Storage). Идемпотентна — если уже выполняли раньше со старым URL Coolray, **перевыполните** (UPDATE перезапишет на новый). Без миграции модели покажут 2D-схему (не сломано).
 6. Authentication → Users → **Add user** (email + пароль, ✅ Auto Confirm) — это логин в админку. Регистрации на сайте нет.
 7. 🔴 **Authentication → Sign In / Up → Email → отключить signups** (по умолчанию в Supabase они ВКЛЮЧЕНЫ). Все RLS-политики дают полный CRUD любому `authenticated` — если регистрация открыта, кто угодно может зарегистрироваться через публичный anon-ключ и получить права админа.
 

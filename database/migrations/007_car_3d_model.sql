@@ -8,9 +8,10 @@
 
 ALTER TABLE car_models ADD COLUMN IF NOT EXISTS model_3d_url TEXT;
 
--- Coolray: optimized 2.5 MB GLB (from a 59 MB source), Draco + WebP, on Cloudinary
+-- Coolray: from a 19 MB FBX → geometry-only GLB, Draco-compressed to ~1.4 MB,
+-- in Supabase Storage (public bucket "models")
 UPDATE car_models
-SET model_3d_url = 'https://res.cloudinary.com/djjcxxgfm/image/upload/v1781342661/coolray-opt_ajz4nc.glb'
+SET model_3d_url = 'https://ekrggwfddacgeolxtuwd.supabase.co/storage/v1/object/public/models/coolray.glb'
 WHERE slug = 'geely-coolray';
 
 -- Monjaro: from a 67 MB FBX → geometry-only GLB, Draco-compressed to ~1 MB,
