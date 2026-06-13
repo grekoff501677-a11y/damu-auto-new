@@ -15,6 +15,7 @@ export function MaintenanceCenter({ models }: { models: PublicMaintModel[] }) {
 
   const model = useMemo(() => models.find((m) => m.slug === modelSlug) ?? models[0], [models, modelSlug])
   const milestones = model?.milestones ?? []
+  const hasMilestones = milestones.length > 0
   const safeIdx = Math.min(milestoneIdx, Math.max(0, milestones.length - 1))
   const milestone = milestones[safeIdx]
   const activeNodes = useMemo<BodyNode[]>(
@@ -52,9 +53,9 @@ export function MaintenanceCenter({ models }: { models: PublicMaintModel[] }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr]">
+      <div className={cn('grid grid-cols-1', hasMilestones && 'lg:grid-cols-[1.1fr_1fr]')}>
         {/* Blueprint */}
-        <div className="relative overflow-hidden border-b border-glass-border lg:border-b-0 lg:border-r">
+        <div className={cn('relative overflow-hidden border-b border-glass-border', hasMilestones ? 'lg:border-b-0 lg:border-r' : 'lg:border-b-0')}>
           {/* fog fills the entire panel */}
           {(model?.blueprint?.image || model?.model3dUrl) && <FogBackground className="absolute inset-0" />}
           {/* faint cool blueprint grid over the fog (fades at edges) */}
@@ -69,13 +70,24 @@ export function MaintenanceCenter({ models }: { models: PublicMaintModel[] }) {
           {/* edge vignette so the car reads against the fog */}
           <div className="pointer-events-none absolute inset-0"
             style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 52%, transparent 40%, rgba(6,21,33,0.5) 100%)' }} />
-          <div className="relative flex h-full min-h-[300px] items-center justify-center p-4 sm:p-6">
+          <div className={cn('relative flex h-full min-h-[300px] items-center justify-center p-4 sm:p-6', !hasMilestones && 'min-h-[440px]')}>
             {model?.model3dUrl ? (
-              <Model3D key={model.model3dUrl} src={model.model3dUrl} modelKey={model.slug} poster={model.blueprint?.image} className="h-[340px] w-full max-w-xl sm:h-[380px]" />
+              <Model3D
+                key={model.model3dUrl}
+                src={model.model3dUrl}
+                modelKey={model.slug}
+                poster={model.blueprint?.image}
+                className={cn('h-[340px] w-full max-w-xl sm:h-[380px]', !hasMilestones && 'max-w-4xl sm:h-[460px]')}
+              />
             ) : (
               <VehicleBlueprint active={activeNodes} blueprint={model?.blueprint} className="w-full max-w-xl" />
             )}
           </div>
+          {!hasMilestones && (
+            <div className="pointer-events-none absolute right-6 top-6 hidden max-w-xs rounded-2xl border border-glass-border bg-surface/45 px-4 py-3 text-right text-sm text-muted-foreground backdrop-blur-md lg:block">
+              Для {model?.name} интервалы ТО ещё не заданы. Добавьте их в админ-панели.
+            </div>
+          )}
           <div className="absolute bottom-4 left-6 flex items-center gap-2 text-xs text-muted-foreground">
             <span className="h-2 w-2 animate-pulse rounded-full bg-accent shadow-[0_0_8px_2px_rgba(196,154,69,0.6)]" />
             {activeNodes.length} активных узлов · {model?.brand} {model?.name}
@@ -83,7 +95,7 @@ export function MaintenanceCenter({ models }: { models: PublicMaintModel[] }) {
         </div>
 
         {/* Gauge + parts */}
-        <div className="p-5 sm:p-6">
+        <div className={cn('p-5 sm:p-6', !hasMilestones && 'hidden')}>
           {milestones.length === 0 ? (
             <div className="flex h-full min-h-[200px] flex-col items-center justify-center text-center">
               <Wrench className="mb-3 h-7 w-7 text-muted-foreground" />

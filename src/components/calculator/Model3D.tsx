@@ -118,7 +118,7 @@ export function Model3D({ src, modelKey, className }: { src: string; modelKey?: 
           enablePan={false}
           enableZoom
           maxDistance={12}
-          minDistance={6.2}
+          minDistance={2.8}
         />
       </Canvas>
 
