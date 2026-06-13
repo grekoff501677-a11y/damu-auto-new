@@ -1,7 +1,7 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { Bounds, OrbitControls, useGLTF, useProgress } from '@react-three/drei'
+import { OrbitControls, useGLTF, useProgress } from '@react-three/drei'
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import * as THREE from 'three'
 import { Loader2, RotateCw } from 'lucide-react'
@@ -9,6 +9,7 @@ import { Loader2, RotateCw } from 'lucide-react'
 // Significant edges only: this keeps high-poly cars readable and cuts the
 // amount of generated line geometry versus drawing every triangle edge.
 const EDGE_THRESHOLD_DEG = 35
+const MODEL_MAX_SIZE = 3.4
 
 const MODEL_ROTATION_FIX: Record<string, [number, number, number]> = {
   // Coolray uses the same exporter axis as Monjaro. Keep the exception explicit
@@ -50,11 +51,18 @@ function WireModel({ url, modelKey, onReady }: { url: string; modelKey?: string;
     const fix = modelKey ? MODEL_ROTATION_FIX[modelKey] : undefined
     if (fix) group.rotateX(fix[0]).rotateY(fix[1]).rotateZ(fix[2])
 
-    const center = new THREE.Box3().setFromObject(group).getCenter(new THREE.Vector3())
+    const box = new THREE.Box3().setFromObject(group)
+    const center = box.getCenter(new THREE.Vector3())
+    const normalizedSize = box.getSize(new THREE.Vector3())
+    const maxDim = Math.max(normalizedSize.x, normalizedSize.y, normalizedSize.z)
     group.position.sub(center)
 
-    edgeCache.set(cacheKey, group)
-    return group.clone(true)
+    const normalized = new THREE.Group()
+    normalized.add(group)
+    normalized.scale.setScalar(maxDim > 0 ? MODEL_MAX_SIZE / maxDim : 1)
+
+    edgeCache.set(cacheKey, normalized)
+    return normalized.clone(true)
   }, [scene, url, modelKey])
 
   useEffect(() => { onReady() }, [onReady])
@@ -101,9 +109,7 @@ export function Model3D({ src, modelKey, className }: { src: string; modelKey?: 
         style={{ background: 'transparent' }}
       >
         <Suspense fallback={null}>
-          <Bounds fit observe margin={2.35}>
-            <WireModel url={src} modelKey={modelKey} onReady={onReady} />
-          </Bounds>
+          <WireModel url={src} modelKey={modelKey} onReady={onReady} />
         </Suspense>
         <OrbitControls
           autoRotate
@@ -112,7 +118,7 @@ export function Model3D({ src, modelKey, className }: { src: string; modelKey?: 
           enablePan={false}
           enableZoom
           maxDistance={12}
-          minDistance={5}
+          minDistance={6.2}
         />
       </Canvas>
 
