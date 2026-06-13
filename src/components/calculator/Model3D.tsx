@@ -27,6 +27,13 @@ function WireModel({ url }: { url: string }) {
         group.add(seg)
       }
     })
+    // normalize orientation: a car's shortest dimension is its height — make
+    // that axis vertical so models from different exporters (Y-up GLB vs
+    // Z-up FBX) all stand on their wheels.
+    const size = new THREE.Box3().setFromObject(group).getSize(new THREE.Vector3())
+    const min = Math.min(size.x, size.y, size.z)
+    if (min === size.z) group.rotateX(-Math.PI / 2)
+    else if (min === size.x) group.rotateZ(Math.PI / 2)
     return group
   }, [scene])
   return <primitive object={obj} />
