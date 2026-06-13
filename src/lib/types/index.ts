@@ -33,6 +33,8 @@ export type CarModel = {
   // blueprint (maintenance schematic)
   blueprint_url?: string | null
   blueprint_nodes?: BlueprintHotspot[] | null
+  // optional optimized .glb shown in the Maintenance Center
+  model_3d_url?: string | null
 }
 
 export type ProductCategory = 'oil' | 'filter' | 'fluid' | 'spark_plug' | 'other'

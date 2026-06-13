@@ -87,6 +87,7 @@ export type PublicMaintModel = {
   slug: string; brand: string; name: string
   milestones: PublicMilestone[]
   blueprint?: BlueprintData
+  model3dUrl?: string
 }
 
 function inferNode(name: string): BodyNode {
@@ -159,6 +160,7 @@ export async function getMaintenanceModels(): Promise<PublicMaintModel[]> {
       name: m.name,
       milestones: buildMilestones(byModel.get(m.id) ?? []),
       blueprint,
+      model3dUrl: m.model_3d_url ?? undefined,
     }
   })
 }

@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { ExternalLink, CheckCircle2, AlertTriangle, Wrench } from 'lucide-react'
 import { VehicleBlueprint, type BodyNode } from './VehicleBlueprint'
+import { Model3D } from './Model3D'
 import { FogBackground } from '@/components/ui/realistic-fog-background'
 import { cn } from '@/lib/utils'
 import type { PublicMaintModel } from '@/lib/queries'
@@ -55,7 +56,7 @@ export function MaintenanceCenter({ models }: { models: PublicMaintModel[] }) {
         {/* Blueprint */}
         <div className="relative overflow-hidden border-b border-glass-border lg:border-b-0 lg:border-r">
           {/* fog fills the entire panel */}
-          {model?.blueprint?.image && <FogBackground className="absolute inset-0" />}
+          {(model?.blueprint?.image || model?.model3dUrl) && <FogBackground className="absolute inset-0" />}
           {/* faint cool blueprint grid over the fog (fades at edges) */}
           <div className="pointer-events-none absolute inset-0"
             style={{
@@ -69,7 +70,11 @@ export function MaintenanceCenter({ models }: { models: PublicMaintModel[] }) {
           <div className="pointer-events-none absolute inset-0"
             style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 52%, transparent 40%, rgba(6,21,33,0.5) 100%)' }} />
           <div className="relative flex h-full min-h-[300px] items-center justify-center p-4 sm:p-6">
-            <VehicleBlueprint active={activeNodes} blueprint={model?.blueprint} className="w-full max-w-xl" />
+            {model?.model3dUrl ? (
+              <Model3D src={model.model3dUrl} poster={model.blueprint?.image} className="h-[340px] w-full max-w-xl sm:h-[380px]" />
+            ) : (
+              <VehicleBlueprint active={activeNodes} blueprint={model?.blueprint} className="w-full max-w-xl" />
+            )}
           </div>
           <div className="absolute bottom-4 left-6 flex items-center gap-2 text-xs text-muted-foreground">
             <span className="h-2 w-2 animate-pulse rounded-full bg-accent shadow-[0_0_8px_2px_rgba(196,154,69,0.6)]" />
