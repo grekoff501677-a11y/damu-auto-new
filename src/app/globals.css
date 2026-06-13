@@ -191,6 +191,17 @@
   animation: shimmer-sweep 8s ease-in-out infinite;
 }
 
+@keyframes progress-shimmer-sweep {
+  0% { background-position: 140% 0; }
+  100% { background-position: -40% 0; }
+}
+.model-progress-shimmer {
+  background: linear-gradient(100deg, #9D7330 0%, #C49A45 30%, #F6E8B8 48%, #D9B870 60%, #C49A45 78%, #8A6429 100%);
+  background-size: 240% 100%;
+  box-shadow: 0 0 14px rgba(196,154,69,0.75), inset 0 0 6px rgba(255,255,255,0.22);
+  animation: progress-shimmer-sweep 1.45s ease-in-out infinite;
+}
+
 /* Min touch target helper (48x48) */
 .touch-target { min-height: 48px; min-width: 48px; }
 

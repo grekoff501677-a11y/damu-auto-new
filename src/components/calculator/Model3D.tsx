@@ -79,7 +79,7 @@ function ModelLoadingOverlay({ loaded }: { loaded: boolean }) {
         </div>
         <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/10">
           <div
-            className="h-full rounded-full bg-accent shadow-[0_0_12px_rgba(196,154,69,0.7)] transition-[width] duration-300"
+            className="model-progress-shimmer h-full rounded-full transition-[width] duration-300"
             style={{ width: `${active ? visibleProgress : 100}%` }}
           />
         </div>
@@ -101,7 +101,7 @@ export function Model3D({ src, modelKey, className }: { src: string; modelKey?: 
         style={{ background: 'transparent' }}
       >
         <Suspense fallback={null}>
-          <Bounds fit observe margin={1.45}>
+          <Bounds fit observe margin={2.35}>
             <WireModel url={src} modelKey={modelKey} onReady={onReady} />
           </Bounds>
         </Suspense>
@@ -112,7 +112,7 @@ export function Model3D({ src, modelKey, className }: { src: string; modelKey?: 
           enablePan={false}
           enableZoom
           maxDistance={12}
-          minDistance={2.5}
+          minDistance={5}
         />
       </Canvas>
 
