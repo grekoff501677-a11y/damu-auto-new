@@ -71,7 +71,7 @@ export function MaintenanceCenter({ models }: { models: PublicMaintModel[] }) {
             style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 52%, transparent 40%, rgba(6,21,33,0.5) 100%)' }} />
           <div className="relative flex h-full min-h-[300px] items-center justify-center p-4 sm:p-6">
             {model?.model3dUrl ? (
-              <Model3D src={model.model3dUrl} poster={model.blueprint?.image} className="h-[340px] w-full max-w-xl sm:h-[380px]" />
+              <Model3D key={model.model3dUrl} src={model.model3dUrl} modelKey={model.slug} poster={model.blueprint?.image} className="h-[340px] w-full max-w-xl sm:h-[380px]" />
             ) : (
               <VehicleBlueprint active={activeNodes} blueprint={model?.blueprint} className="w-full max-w-xl" />
             )}

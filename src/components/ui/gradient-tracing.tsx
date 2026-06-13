@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useId } from "react"
 import { motion } from "motion/react"
 
 interface GradientTracingProps {
@@ -25,7 +25,7 @@ export const GradientTracing: React.FC<GradientTracingProps> = ({
   path = `M0,${height / 2} L${width},${height / 2}`,
   responsive = false,
 }) => {
-  const gradientId = `pulse-${Math.random().toString(36).substr(2, 9)}`
+  const gradientId = useId().replace(/:/g, '')
 
   return (
     <div className="relative" style={responsive ? { width: '100%', height: '100%' } : { width, height }}>

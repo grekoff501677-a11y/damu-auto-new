@@ -1,23 +1,35 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { useGLTF, OrbitControls, Bounds } from '@react-three/drei'
+import { Bounds, OrbitControls, useGLTF, useProgress } from '@react-three/drei'
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import * as THREE from 'three'
 import { Loader2, RotateCw } from 'lucide-react'
 
-// Render the GLB as a clean gold "blueprint" mesh (no textures): only the
-// significant edges (EdgesGeometry by face-angle), not every triangle — so a
-// high-poly model reads as a crisp wireframe, not a solid gold blob. Sits on
-// the Maintenance Center's fog + grid. Draco GLB decoded via drei CDN decoder.
-const EDGE_THRESHOLD_DEG = 22
+// Significant edges only: this keeps high-poly cars readable and cuts the
+// amount of generated line geometry versus drawing every triangle edge.
+const EDGE_THRESHOLD_DEG = 35
 
-function WireModel({ url, onReady }: { url: string; onReady: () => void }) {
+const MODEL_ROTATION_FIX: Record<string, [number, number, number]> = {
+  // Coolray uses the same exporter axis as Monjaro. Keep the exception explicit
+  // so we can tune this model without touching the generic normalization.
+  'geely-coolray': [Math.PI / 2, 0, 0],
+}
+
+const edgeCache = new Map<string, THREE.Group>()
+
+function WireModel({ url, modelKey, onReady }: { url: string; modelKey?: string; onReady: () => void }) {
   const { scene } = useGLTF(url)
+
   const obj = useMemo(() => {
+    const cacheKey = `${modelKey ?? 'model'}:${url}`
+    const cached = edgeCache.get(cacheKey)
+    if (cached) return cached.clone(true)
+
     const group = new THREE.Group()
-    scene.updateWorldMatrix(true, true)
     const mat = new THREE.LineBasicMaterial({ color: '#CDA64E', transparent: true, opacity: 0.6 })
+
+    scene.updateWorldMatrix(true, true)
     scene.traverse((o) => {
       const mesh = o as THREE.Mesh
       if (mesh.isMesh && mesh.geometry) {
@@ -27,64 +39,85 @@ function WireModel({ url, onReady }: { url: string; onReady: () => void }) {
         group.add(seg)
       }
     })
-    // normalize orientation: a car's shortest dimension is its height — make
-    // that axis vertical so models from different exporters (Y-up GLB vs
-    // Z-up FBX) all stand on their wheels.
+
+    // A car's shortest dimension is usually height. Make that axis vertical so
+    // Y-up and Z-up exports stand on their wheels before per-model tweaks.
     const size = new THREE.Box3().setFromObject(group).getSize(new THREE.Vector3())
     const min = Math.min(size.x, size.y, size.z)
     if (min === size.z) group.rotateX(-Math.PI / 2)
     else if (min === size.x) group.rotateZ(Math.PI / 2)
-    return group
-  }, [scene])
+
+    const fix = modelKey ? MODEL_ROTATION_FIX[modelKey] : undefined
+    if (fix) group.rotateX(fix[0]).rotateY(fix[1]).rotateZ(fix[2])
+
+    const center = new THREE.Box3().setFromObject(group).getCenter(new THREE.Vector3())
+    group.position.sub(center)
+
+    edgeCache.set(cacheKey, group)
+    return group.clone(true)
+  }, [scene, url, modelKey])
 
   useEffect(() => { onReady() }, [onReady])
   return <primitive object={obj} />
 }
 
-export function Model3D({ src, className }: { src: string; poster?: string; className?: string }) {
-  const [mounted, setMounted] = useState(false)
-  const [loaded, setLoaded] = useState(false)
-  useEffect(() => { setMounted(true) }, [])
-  const onReady = useCallback(() => setLoaded(true), [])
+function ModelLoadingOverlay({ loaded }: { loaded: boolean }) {
+  const { active, progress } = useProgress()
+  if (loaded) return null
 
-  if (!mounted) {
-    return (
-      <div className={className} style={{ display: 'grid', placeItems: 'center' }}>
-        <Loader2 className="h-6 w-6 animate-spin text-accent/70" />
+  const visibleProgress = Math.max(4, Math.round(progress || 0))
+  const label = active && visibleProgress < 100 ? `Загрузка 3D · ${visibleProgress}%` : 'Строим каркас…'
+
+  return (
+    <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-4">
+      <div className="min-w-[178px] rounded-2xl border border-glass-border bg-surface/75 px-4 py-3 shadow-[0_18px_60px_-30px_rgba(0,0,0,0.9)] backdrop-blur-xl">
+        <div className="flex items-center gap-3">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-accent shadow-[0_0_18px_-8px_rgba(196,154,69,0.9)]">
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </span>
+          <span className="text-[11px] font-600 uppercase tracking-wide text-foreground/80">{label}</span>
+        </div>
+        <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/10">
+          <div
+            className="h-full rounded-full bg-accent shadow-[0_0_12px_rgba(196,154,69,0.7)] transition-[width] duration-300"
+            style={{ width: `${active ? visibleProgress : 100}%` }}
+          />
+        </div>
       </div>
-    )
-  }
+    </div>
+  )
+}
+
+export function Model3D({ src, modelKey, className }: { src: string; modelKey?: string; poster?: string; className?: string }) {
+  const [loaded, setLoaded] = useState(false)
+  const onReady = useCallback(() => setLoaded(true), [])
 
   return (
     <div className={className} style={{ position: 'relative' }}>
       <Canvas
-        // wide near/far so close-up framing never clips the model (no "invisible edge")
-        camera={{ position: [3.6, 1.5, 4.6], fov: 38, near: 0.01, far: 100 }}
-        gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
-        // cap DPR — mobile retina at 2–3× murders fps/load for little gain here
+        camera={{ position: [4.2, 1.8, 5.4], fov: 35, near: 0.01, far: 100 }}
         dpr={[1, 1.5]}
+        gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
         style={{ background: 'transparent' }}
       >
         <Suspense fallback={null}>
-          {/* fit + observe (no `clip`: clip tightens near/far and crops geometry up close) */}
-          <Bounds fit observe margin={1.15}>
-            <WireModel url={src} onReady={onReady} />
+          <Bounds fit observe margin={1.45}>
+            <WireModel url={src} modelKey={modelKey} onReady={onReady} />
           </Bounds>
         </Suspense>
         <OrbitControls
-          enablePan={false} enableZoom enableDamping
-          autoRotate autoRotateSpeed={0.7}
-          minDistance={2.5} maxDistance={12}
+          autoRotate
+          autoRotateSpeed={0.7}
+          enableDamping
+          enablePan={false}
+          enableZoom
+          maxDistance={12}
+          minDistance={2.5}
         />
       </Canvas>
 
-      {/* visible loading state until the model is parsed + edges built */}
-      {!loaded && (
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
-          <Loader2 className="h-6 w-6 animate-spin text-accent/70" />
-          <span className="text-[11px]">Загрузка 3D…</span>
-        </div>
-      )}
+      <ModelLoadingOverlay loaded={loaded} />
+
       {loaded && (
         <span className="pointer-events-none absolute bottom-2 right-2 flex items-center gap-1 rounded-full border border-glass-border bg-black/40 px-2 py-1 text-[10px] text-muted-foreground backdrop-blur-md">
           <RotateCw className="h-3 w-3" /> Вращайте

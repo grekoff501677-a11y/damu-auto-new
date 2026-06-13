@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import { motion } from 'motion/react'
 import { ShieldCheck, ShieldX, Search, Move } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -31,10 +31,24 @@ export function MacroCompareSlider({ original, counterfeit, className, caption }
 
   const [pos, setPos] = useState(50)
   const [source, setSource] = useState<{ x: number; y: number } | null>(null) // point being magnified
+  const [size, setSize] = useState({ width: 0, height: 0 })
   const [lensOn, setLensOn] = useState(false)        // mouse toggle
   const [touchLens, setTouchLens] = useState(false)  // touch hold
 
   const rectOf = () => ref.current?.getBoundingClientRect()
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const syncSize = () => {
+      const rect = el.getBoundingClientRect()
+      setSize({ width: rect.width, height: rect.height })
+    }
+    syncSize()
+    const ro = new ResizeObserver(syncSize)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   const updateSlider = useCallback((clientX: number) => {
     const rect = rectOf(); if (!rect) return
@@ -79,8 +93,7 @@ export function MacroCompareSlider({ original, counterfeit, className, caption }
   }
 
   // which side is magnified?
-  const rect = rectOf()
-  const overOriginal = source && rect ? (source.x / rect.width) * 100 < pos : false
+  const overOriginal = source && size.width ? (source.x / size.width) * 100 < pos : false
   const lensSide = overOriginal ? original : counterfeit
   const active = lensOn || touchLens
 
@@ -117,7 +130,7 @@ export function MacroCompareSlider({ original, counterfeit, className, caption }
         <Tag className="right-3 top-3 text-destructive" icon={<ShieldX className="h-3.5 w-3.5" />}>{counterfeit.label}</Tag>
 
         {/* Macro lens */}
-        {active && source && rect && (
+        {active && source && size.width > 0 && (
           <motion.div
             initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -129,7 +142,7 @@ export function MacroCompareSlider({ original, counterfeit, className, caption }
               backgroundImage: lensSide.image ? `url(${lensSide.image})` : lensSide.texture,
               backgroundRepeat: lensSide.image ? 'no-repeat' : undefined,
               backgroundSize: lensSide.image
-                ? `${rect.width * ZOOM}px ${rect.height * ZOOM}px`
+                ? `${size.width * ZOOM}px ${size.height * ZOOM}px`
                 : `${48 * ZOOM}px ${48 * ZOOM}px`,
               backgroundPosition: `-${source.x * ZOOM - LENS / 2}px -${source.y * ZOOM - LENS / 2}px`,
               boxShadow: '0 0 0 4px rgba(0,0,0,0.4), 0 20px 40px -8px rgba(0,0,0,0.7), 0 0 24px -4px rgba(196,154,69,0.5)',
