@@ -15,6 +15,14 @@ const MODEL_MAX_SIZE = 3.4
 const CANVAS_OVERSCAN_PCT = 28
 const CANVAS_SIZE_PCT = 100 + CANVAS_OVERSCAN_PCT * 2
 
+// Per-model orientation fix applied AFTER the generic auto-axis normalize.
+// The generic step makes the shortest axis vertical (good for Monjaro), but
+// Coolray stays mis-oriented and needs an extra +90° on X. bbox can't tell a
+// car's top from its bottom, so this stays an explicit per-slug override.
+const MODEL_ROTATION_FIX: Record<string, [number, number, number]> = {
+  'geely-coolray': [Math.PI / 2, 0, 0],
+}
+
 const edgeCache = new Map<string, THREE.Group>()
 
 function WireModel({ url, modelKey, onReady }: { url: string; modelKey?: string; onReady: () => void }) {
@@ -39,13 +47,16 @@ function WireModel({ url, modelKey, onReady }: { url: string; modelKey?: string;
       }
     })
 
-    // A car's shortest dimension is its height. Make that axis vertical so any
-    // exporter axis (Y-up GLB / Z-up FBX) stands the model on its wheels —
-    // works for every car, no per-model rotation hacks.
+    // Generic auto-axis: a car's shortest dimension is its height. Make that
+    // axis vertical so any exporter axis (Y-up GLB / Z-up FBX) stands upright.
     const size = new THREE.Box3().setFromObject(group).getSize(new THREE.Vector3())
     const min = Math.min(size.x, size.y, size.z)
     if (min === size.z) group.rotateX(-Math.PI / 2)
     else if (min === size.x) group.rotateZ(Math.PI / 2)
+
+    // Per-model override applied on top of the generic normalize (Coolray).
+    const fix = modelKey ? MODEL_ROTATION_FIX[modelKey] : undefined
+    if (fix) group.rotateX(fix[0]).rotateY(fix[1]).rotateZ(fix[2])
 
     const box = new THREE.Box3().setFromObject(group)
     const center = box.getCenter(new THREE.Vector3())
