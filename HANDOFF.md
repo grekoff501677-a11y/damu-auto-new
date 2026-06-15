@@ -104,7 +104,7 @@ database/
   migrations/004_blueprints_all_models.sql  # схемы + хотспоты для Atlas/Coolray/Okavango
   migrations/005_page_sections.sql  # таблица page_sections (конструктор главной) + сид 5 секций
   migrations/006_page_blocks.sql    # +is_system, снятие UNIQUE → добавляемые блоки (текст/баннер/разделитель)
-  migrations/007_car_3d_model.sql   # car_models.model_3d_url + GLB-ссылка Coolray
+  migrations/007_car_3d_model.sql   # car_models.model_3d_url + GLB-ссылки Coolray/Monjaro/Atlas
 scripts/
   upload-3d.mjs                     # one-off: заливка оптимизированного GLB в Supabase Storage (читает .env.local)
 ```
@@ -112,7 +112,7 @@ scripts/
 ### Как добавить 3D-модель новой машины (процесс)
 Рендерится **только геометрия** (wireframe) — текстуры/материалы не нужны, можно выбрасывать.
 - **Если исходник GLB:** `npx @gltf-transform/cli optimize in.glb out.glb --compress draco --texture-compress webp` (optimize включает simplify — для wireframe незаметно).
-- **Если исходник FBX** (`.max` бесполезны — нативный 3ds Max, не конвертируются без него; текстуры/`maps` не нужны; при выборе из нескольких FBX берём НЕ highPoly — обычный даёт чище сетку): сначала FBX→GLB через `fbx2gltf` (npm-пакет, API: `import convert from 'fbx2gltf'; await convert(src, dst, ['--binary'])`), затем выбросить текстуры (`scripts/strip-textures.mjs`) и `gltf-transform optimize … --compress draco`. Примеры: Monjaro 67 МБ FBX → **0.98 МБ**; Coolray 19 МБ FBX → **1.4 МБ**. Обе в Supabase Storage (бакет `models`).
+- **Если исходник FBX** (`.max` бесполезны — нативный 3ds Max, не конвертируются без него; текстуры/`maps` не нужны; при выборе из нескольких FBX берём НЕ highPoly — обычный даёт чище сетку): сначала FBX→GLB через `fbx2gltf` (npm-пакет, API: `import convert from 'fbx2gltf'; await convert(src, dst, ['--binary'])`), затем выбросить текстуры (`scripts/strip-textures.mjs`) и `gltf-transform optimize … --compress draco`. Примеры: Monjaro 67 МБ FBX → **0.98 МБ**; Coolray 19 МБ FBX → **1.4 МБ**; Atlas (Geely Boyue L) 23 МБ FBX → **1.5 МБ** (с `--simplify false` — детализация сохранена полностью, модель чистая). ⚠️ Бинарник `fbx2gltf` падает на путях с не-ASCII символами (китайские имена папок) — копировать исходник в чистый ASCII-путь перед конвертацией. Залить можно `scripts/upload-3d.mjs`, прописать URL в БД — `scripts/set-3d-url.mjs <slug> <url>` (PATCH через service-role). Ориентация: Atlas/Monjaro — генерик; Coolray — per-model `+90° X`.
 1. Залить на CDN: Cloudinary (raw/image upload, CORS `*`) либо Supabase Storage (`node scripts/upload-3d.mjs <файл> <имя.glb>` → публичный URL).
 2. Прописать URL: `UPDATE car_models SET model_3d_url = '...' WHERE slug = '...'`. Центр ТО сам покажет wireframe; ориентация нормализуется автоматически.
 
@@ -150,7 +150,7 @@ scripts/
 5. SQL Editor → выполнить **`database/migrations/003_rls_security_fixes.sql`** — админ-политики записи для `product_compatibility`/`blog_post_products` + удаление anon-INSERT в `leads`. (В свежем `schema.sql` это уже учтено, но на существующей БД миграция обязательна — иначе совместимость товаров не сохраняется.)
 5a. SQL Editor → выполнить **`database/migrations/004_blueprints_all_models.sql`** — схемы (Cloudinary SVG) + по 5 хотспотов для Atlas/Coolray/Okavango. Позиции выверены по реальной отрисовке узлов на каждой схеме; точную подгонку делать в `/admin/blueprints`.
 5b. SQL Editor → выполнить **`database/migrations/005_page_sections.sql`**, затем **`database/migrations/006_page_blocks.sql`** — таблица `page_sections` + сид 5 секций (005), затем `is_system`/снятие UNIQUE для добавляемых блоков (006). Без 005 конструктор не сохраняет; без 006 не работает добавление блоков (`ensureSystemBlocks` обращается к колонке `is_system`). В свежем `schema.sql` уже всё учтено.
-5c. SQL Editor → выполнить **`database/migrations/007_car_3d_model.sql`** — колонка `car_models.model_3d_url` + GLB-ссылки Coolray и Monjaro (обе в Supabase Storage). Идемпотентна — если уже выполняли раньше со старым URL Coolray, **перевыполните** (UPDATE перезапишет на новый). Без миграции модели покажут 2D-схему (не сломано).
+5c. SQL Editor → выполнить **`database/migrations/007_car_3d_model.sql`** — колонка `car_models.model_3d_url` + GLB-ссылки Coolray/Monjaro/Atlas (все в Supabase Storage). Идемпотентна — можно перевыполнять (UPDATE перезапишет URL). Без миграции модели покажут 2D-схему (не сломано). На рабочей БД URL'ы уже применены через `scripts/set-3d-url.mjs`.
 6. Authentication → Users → **Add user** (email + пароль, ✅ Auto Confirm) — это логин в админку. Регистрации на сайте нет.
 7. 🔴 **Authentication → Sign In / Up → Email → отключить signups** (по умолчанию в Supabase они ВКЛЮЧЕНЫ). Все RLS-политики дают полный CRUD любому `authenticated` — если регистрация открыта, кто угодно может зарегистрироваться через публичный anon-ключ и получить права админа.
 

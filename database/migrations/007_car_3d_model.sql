@@ -19,3 +19,9 @@ WHERE slug = 'geely-coolray';
 UPDATE car_models
 SET model_3d_url = 'https://ekrggwfddacgeolxtuwd.supabase.co/storage/v1/object/public/models/monjaro.glb'
 WHERE slug = 'geely-monjaro';
+
+-- Atlas (Geely Boyue L): from a 23 MB FBX → geometry-only GLB, full detail kept
+-- (no simplify), Draco-compressed to ~1.5 MB. Generic auto-axis = upright, no fix.
+UPDATE car_models
+SET model_3d_url = 'https://ekrggwfddacgeolxtuwd.supabase.co/storage/v1/object/public/models/atlas.glb'
+WHERE slug = 'geely-atlas';
