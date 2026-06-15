@@ -10,12 +10,10 @@ import { Loader2, RotateCw } from 'lucide-react'
 // amount of generated line geometry versus drawing every triangle edge.
 const EDGE_THRESHOLD_DEG = 35
 const MODEL_MAX_SIZE = 3.4
-
-const MODEL_ROTATION_FIX: Record<string, [number, number, number]> = {
-  // Coolray uses the same exporter axis as Monjaro. Keep the exception explicit
-  // so we can tune this model without touching the generic normalization.
-  'geely-coolray': [Math.PI / 2, 0, 0],
-}
+// modest overscan hides the canvas rectangle when zoomed; kept small so the
+// render buffer (and mobile cost) stays reasonable
+const CANVAS_OVERSCAN_PCT = 28
+const CANVAS_SIZE_PCT = 100 + CANVAS_OVERSCAN_PCT * 2
 
 const edgeCache = new Map<string, THREE.Group>()
 
@@ -41,15 +39,13 @@ function WireModel({ url, modelKey, onReady }: { url: string; modelKey?: string;
       }
     })
 
-    // A car's shortest dimension is usually height. Make that axis vertical so
-    // Y-up and Z-up exports stand on their wheels before per-model tweaks.
+    // A car's shortest dimension is its height. Make that axis vertical so any
+    // exporter axis (Y-up GLB / Z-up FBX) stands the model on its wheels —
+    // works for every car, no per-model rotation hacks.
     const size = new THREE.Box3().setFromObject(group).getSize(new THREE.Vector3())
     const min = Math.min(size.x, size.y, size.z)
     if (min === size.z) group.rotateX(-Math.PI / 2)
     else if (min === size.x) group.rotateZ(Math.PI / 2)
-
-    const fix = modelKey ? MODEL_ROTATION_FIX[modelKey] : undefined
-    if (fix) group.rotateX(fix[0]).rotateY(fix[1]).rotateZ(fix[2])
 
     const box = new THREE.Box3().setFromObject(group)
     const center = box.getCenter(new THREE.Vector3())
@@ -98,29 +94,51 @@ function ModelLoadingOverlay({ loaded }: { loaded: boolean }) {
 
 export function Model3D({ src, modelKey, className }: { src: string; modelKey?: string; poster?: string; className?: string }) {
   const [loaded, setLoaded] = useState(false)
+  // mount the heavy Canvas only after the loader has painted, so the
+  // synchronous edge build never blocks the very first frame (the loader
+  // is already on screen during the freeze)
+  const [start, setStart] = useState(false)
   const onReady = useCallback(() => setLoaded(true), [])
 
+  useEffect(() => {
+    let r2 = 0
+    const r1 = requestAnimationFrame(() => { r2 = requestAnimationFrame(() => setStart(true)) })
+    return () => { cancelAnimationFrame(r1); cancelAnimationFrame(r2) }
+  }, [])
+
   return (
-    <div className={className} style={{ position: 'relative' }}>
-      <Canvas
-        camera={{ position: [4.2, 1.8, 5.4], fov: 35, near: 0.01, far: 100 }}
-        dpr={[1, 1.5]}
-        gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
-        style={{ background: 'transparent' }}
-      >
-        <Suspense fallback={null}>
-          <WireModel url={src} modelKey={modelKey} onReady={onReady} />
-        </Suspense>
-        <OrbitControls
-          autoRotate
-          autoRotateSpeed={0.7}
-          enableDamping
-          enablePan={false}
-          enableZoom
-          maxDistance={12}
-          minDistance={2.8}
-        />
-      </Canvas>
+    <div className={className} style={{ position: 'relative', overflow: 'visible' }}>
+      {start && (
+        <div
+          style={{
+            height: `${CANVAS_SIZE_PCT}%`,
+            inset: `-${CANVAS_OVERSCAN_PCT}%`,
+            position: 'absolute',
+            touchAction: 'none',
+            width: `${CANVAS_SIZE_PCT}%`,
+          }}
+        >
+          <Canvas
+            camera={{ position: [4.2, 1.8, 5.4], fov: 35, near: 0.01, far: 100 }}
+            dpr={[1, 1.5]}
+            gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
+            style={{ background: 'transparent' }}
+          >
+            <Suspense fallback={null}>
+              <WireModel url={src} modelKey={modelKey} onReady={onReady} />
+            </Suspense>
+            <OrbitControls
+              autoRotate
+              autoRotateSpeed={0.7}
+              enableDamping
+              enablePan={false}
+              enableZoom
+              maxDistance={12}
+              minDistance={2.8}
+            />
+          </Canvas>
+        </div>
+      )}
 
       <ModelLoadingOverlay loaded={loaded} />
 
