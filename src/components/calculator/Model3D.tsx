@@ -2,7 +2,7 @@
 
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, useGLTF, useProgress } from '@react-three/drei'
-import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { Loader2, RotateCw } from 'lucide-react'
 import { NodeSwarm } from './NodeSwarm'
@@ -123,7 +123,14 @@ export function Model3D({ src, modelKey, className, activeNodes = [], nodes }: {
   // synchronous edge build never blocks the very first frame (the loader
   // is already on screen during the freeze)
   const [start, setStart] = useState(false)
+  // pause the render loop when the block is off-screen — saves a lot of CPU/GPU
+  const [visible, setVisible] = useState(true)
+  const wrapRef = useRef<HTMLDivElement>(null)
   const onReady = useCallback((size: THREE.Vector3) => { setLoaded(true); setNormSize(size) }, [])
+
+  // cap pixel ratio hard on mobile — retina 2–3× is the biggest cost for little gain
+  const [dprMax] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches ? 1 : 1.5)
 
   // hand-authored regions from DB, else generic defaults from the model bbox
   const regions = useMemo<Node3DRegion[]>(() => {
@@ -137,8 +144,19 @@ export function Model3D({ src, modelKey, className, activeNodes = [], nodes }: {
     return () => { cancelAnimationFrame(r1); cancelAnimationFrame(r2) }
   }, [])
 
+  useEffect(() => {
+    const el = wrapRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(
+      ([e]) => setVisible(e.isIntersecting),
+      { rootMargin: '200px' }
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
   return (
-    <div className={className} style={{ position: 'relative', overflow: 'visible' }}>
+    <div ref={wrapRef} className={className} style={{ position: 'relative', overflow: 'visible' }}>
       {start && (
         <div
           style={{
@@ -150,8 +168,9 @@ export function Model3D({ src, modelKey, className, activeNodes = [], nodes }: {
           }}
         >
           <Canvas
+            frameloop={visible ? 'always' : 'never'}
             camera={{ position: [4.2, 1.8, 5.4], fov: 35, near: 0.01, far: 100 }}
-            dpr={[1, 1.5]}
+            dpr={[1, dprMax]}
             gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
             style={{ background: 'transparent' }}
           >
