@@ -77,6 +77,8 @@ export function MaintenanceCenter({ models }: { models: PublicMaintModel[] }) {
                 src={model.model3dUrl}
                 modelKey={model.slug}
                 poster={model.blueprint?.image}
+                activeNodes={activeNodes}
+                nodes={model.nodes3d}
                 className={cn('h-[340px] w-full max-w-xl sm:h-[380px]', !hasMilestones && 'max-w-4xl sm:h-[460px]')}
               />
             ) : (

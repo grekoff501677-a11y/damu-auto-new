@@ -35,6 +35,21 @@ export type CarModel = {
   blueprint_nodes?: BlueprintHotspot[] | null
   // optional optimized .glb shown in the Maintenance Center
   model_3d_url?: string | null
+  // 3D node regions (particle-swarm highlights) in normalized model space
+  model_3d_nodes?: Node3DRegion[] | null
+}
+
+/** A maintenance node region on the 3D model (normalized space, vertical = Y).
+ *  Rendered as a glowing particle swarm when its bodyNode is active. */
+export type Node3DRegion = {
+  id: string
+  bodyNode: BodyNode
+  shape: 'sphere' | 'box'
+  x: number; y: number; z: number
+  /** sphere radius */
+  r?: number
+  /** box half-extents */
+  sx?: number; sy?: number; sz?: number
 }
 
 export type ProductCategory = 'oil' | 'filter' | 'fluid' | 'spark_plug' | 'other'

@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { BodyNode, BlueprintData } from '@/components/calculator/VehicleBlueprint'
 import { getBlueprint } from '@/lib/vehicle-blueprints'
 import { resolveBlocks, type ResolvedBlock } from '@/lib/page-sections'
-import type { Product, CarModel, BlogPost } from '@/lib/types'
+import type { Product, CarModel, BlogPost, Node3DRegion } from '@/lib/types'
 
 const KASPI_FALLBACK = 'https://kaspi.kz/shop'
 
@@ -88,6 +88,7 @@ export type PublicMaintModel = {
   milestones: PublicMilestone[]
   blueprint?: BlueprintData
   model3dUrl?: string
+  nodes3d?: Node3DRegion[]
 }
 
 function inferNode(name: string): BodyNode {
@@ -161,6 +162,7 @@ export async function getMaintenanceModels(): Promise<PublicMaintModel[]> {
       milestones: buildMilestones(byModel.get(m.id) ?? []),
       blueprint,
       model3dUrl: m.model_3d_url ?? undefined,
+      nodes3d: (Array.isArray(m.model_3d_nodes) ? m.model_3d_nodes : undefined) as Node3DRegion[] | undefined,
     }
   })
 }

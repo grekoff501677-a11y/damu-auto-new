@@ -5,6 +5,12 @@ import { OrbitControls, useGLTF, useProgress } from '@react-three/drei'
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import * as THREE from 'three'
 import { Loader2, RotateCw } from 'lucide-react'
+import { NodeSwarm } from './NodeSwarm'
+import type { BodyNode } from './VehicleBlueprint'
+import type { Node3DRegion } from '@/lib/types'
+import { defaultRegions } from '@/lib/node-regions'
+
+const SWARM_COLOR = '#bfe9ff' // active node glow (cyan-white, distinct from gold wireframe)
 
 // Significant edges only: this keeps high-poly cars readable and cuts the
 // amount of generated line geometry versus drawing every triangle edge.
@@ -25,13 +31,16 @@ const MODEL_ROTATION_FIX: Record<string, [number, number, number]> = {
 
 const edgeCache = new Map<string, THREE.Group>()
 
-function WireModel({ url, modelKey, onReady }: { url: string; modelKey?: string; onReady: () => void }) {
+function WireModel({ url, modelKey, onReady }: { url: string; modelKey?: string; onReady: (size: THREE.Vector3) => void }) {
   const { scene } = useGLTF(url)
 
-  const obj = useMemo(() => {
+  const { obj, size } = useMemo(() => {
     const cacheKey = `${modelKey ?? 'model'}:${url}`
     const cached = edgeCache.get(cacheKey)
-    if (cached) return cached.clone(true)
+    if (cached) {
+      const c = cached.clone(true)
+      return { obj: c, size: new THREE.Box3().setFromObject(c).getSize(new THREE.Vector3()) }
+    }
 
     const group = new THREE.Group()
     const mat = new THREE.LineBasicMaterial({ color: '#CDA64E', transparent: true, opacity: 0.6 })
@@ -69,10 +78,11 @@ function WireModel({ url, modelKey, onReady }: { url: string; modelKey?: string;
     normalized.scale.setScalar(maxDim > 0 ? MODEL_MAX_SIZE / maxDim : 1)
 
     edgeCache.set(cacheKey, normalized)
-    return normalized.clone(true)
+    const clone = normalized.clone(true)
+    return { obj: clone, size: new THREE.Box3().setFromObject(clone).getSize(new THREE.Vector3()) }
   }, [scene, url, modelKey])
 
-  useEffect(() => { onReady() }, [onReady])
+  useEffect(() => { onReady(size) }, [onReady, size])
   return <primitive object={obj} />
 }
 
@@ -103,13 +113,23 @@ function ModelLoadingOverlay({ loaded }: { loaded: boolean }) {
   )
 }
 
-export function Model3D({ src, modelKey, className }: { src: string; modelKey?: string; poster?: string; className?: string }) {
+export function Model3D({ src, modelKey, className, activeNodes = [], nodes }: {
+  src: string; modelKey?: string; poster?: string; className?: string
+  activeNodes?: BodyNode[]; nodes?: Node3DRegion[] | null
+}) {
   const [loaded, setLoaded] = useState(false)
+  const [normSize, setNormSize] = useState<THREE.Vector3 | null>(null)
   // mount the heavy Canvas only after the loader has painted, so the
   // synchronous edge build never blocks the very first frame (the loader
   // is already on screen during the freeze)
   const [start, setStart] = useState(false)
-  const onReady = useCallback(() => setLoaded(true), [])
+  const onReady = useCallback((size: THREE.Vector3) => { setLoaded(true); setNormSize(size) }, [])
+
+  // hand-authored regions from DB, else generic defaults from the model bbox
+  const regions = useMemo<Node3DRegion[]>(() => {
+    if (nodes && nodes.length) return nodes
+    return normSize ? defaultRegions(normSize) : []
+  }, [nodes, normSize])
 
   useEffect(() => {
     let r2 = 0
@@ -138,6 +158,9 @@ export function Model3D({ src, modelKey, className }: { src: string; modelKey?: 
             <Suspense fallback={null}>
               <WireModel url={src} modelKey={modelKey} onReady={onReady} />
             </Suspense>
+            {regions.map((r) => (
+              <NodeSwarm key={r.id} region={r} color={SWARM_COLOR} active={activeNodes.includes(r.bodyNode)} />
+            ))}
             <OrbitControls
               autoRotate
               autoRotateSpeed={0.7}
