@@ -25,3 +25,9 @@ WHERE slug = 'geely-monjaro';
 UPDATE car_models
 SET model_3d_url = 'https://ekrggwfddacgeolxtuwd.supabase.co/storage/v1/object/public/models/atlas.glb'
 WHERE slug = 'geely-atlas';
+
+-- Okavango: AI-generated 56 MB GLB → geometry-only, Draco-compressed to ~1.1 MB.
+-- Native Y-up (shortest axis = height) → generic auto-axis keeps it upright, no fix.
+UPDATE car_models
+SET model_3d_url = 'https://ekrggwfddacgeolxtuwd.supabase.co/storage/v1/object/public/models/okavango.glb'
+WHERE slug = 'geely-okavango';
