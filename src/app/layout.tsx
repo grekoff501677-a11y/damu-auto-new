@@ -23,6 +23,10 @@ export const metadata: Metadata = {
     'Премиальный хаб оригинальных запчастей для Geely. Интерактивный калькулятор ТО, макро-сравнение оригинала и подделки, каталог с OEM-номерами.',
   keywords: ['Geely', 'Atlas', 'Monjaro', 'Coolray', 'Okavango', 'запчасти', 'Павлодар', 'ТО', 'оригинал', 'Damu Auto'],
   openGraph: { type: 'website', locale: 'ru_RU', siteName: 'Damu Auto' },
+  // Facebook Business domain verification (rendered server-side into <head>)
+  other: {
+    'facebook-domain-verification': '5t2zm7m5fili9dvvig4er3ys4eagm7',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
