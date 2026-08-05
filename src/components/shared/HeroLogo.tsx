@@ -3,10 +3,9 @@
 import { GradientTracing } from '@/components/ui/gradient-tracing'
 import { cn } from '@/lib/utils'
 
-// Знак DAMU (вектор). e_trim обрезает пустые поля артборда SVG (обязателен),
-// f_auto,q_auto,w_700 отдаёт оптимизированный растр (~23 КБ).
-const LOGO =
-  'https://res.cloudinary.com/djjcxxgfm/image/upload/e_trim/f_auto,q_auto,w_700/v1781179834/%D0%B4%D0%B0%D0%BC%D1%832_ztg9td.svg'
+// Знак DAMU (вектор, ~15 КБ). Лежит локально: viewBox уже обрезан по эмблеме,
+// поэтому знак центрируется сам и остаётся резким на любом размере.
+const LOGO = '/images/logo.svg'
 
 // design space for the tracing ring (scales to the container via viewBox)
 const SIZE = 600

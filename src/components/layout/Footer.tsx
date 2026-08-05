@@ -42,11 +42,10 @@ export function Footer() {
           <div className="col-span-1 sm:col-span-2 lg:col-span-1">
             <Link href="/" className="inline-flex items-center gap-2.5 cursor-pointer">
               <Image
-                src="/images/logo.png"
+                src="/images/logo.svg"
                 alt="Damu Auto"
                 width={36}
                 height={36}
-                sizes="36px"
                 className="h-9 w-9 rounded-full ring-1 ring-accent/30"
               />
               <span className="font-heading text-lg font-700 tracking-tight">

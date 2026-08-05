@@ -65,12 +65,11 @@ export function Header() {
         >
           <Link href="/" className="group flex items-center gap-2.5 cursor-pointer select-none">
             <Image
-              src="/images/logo.png"
+              src="/images/logo.svg"
               alt="Damu Auto"
               width={40}
               height={40}
               priority
-              sizes="40px"
               className="h-10 w-10 rounded-full ring-1 ring-accent/30 transition-shadow duration-200 group-hover:shadow-[0_0_16px_-2px_rgba(196,154,69,0.6)]"
             />
             <span className="font-heading text-lg font-700 tracking-tight text-foreground">
