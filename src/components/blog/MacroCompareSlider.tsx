@@ -120,7 +120,7 @@ export function MacroCompareSlider({ original, counterfeit, className, caption }
 
         {/* divider */}
         <div className="absolute inset-y-0 z-20" style={{ left: `${pos}%`, transform: 'translateX(-50%)' }}>
-          <div className="h-full w-px bg-accent/80 shadow-[0_0_12px_rgba(196,154,69,0.6)]" />
+          <div className="h-full w-px bg-accent/80 shadow-[0_0_12px_rgba(192,157,81,0.6)]" />
           <div className="absolute left-1/2 top-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-accent/40 bg-black/50 backdrop-blur-md">
             <Move className="h-4 w-4 text-accent" />
           </div>
@@ -145,7 +145,7 @@ export function MacroCompareSlider({ original, counterfeit, className, caption }
                 ? `${size.width * ZOOM}px ${size.height * ZOOM}px`
                 : `${48 * ZOOM}px ${48 * ZOOM}px`,
               backgroundPosition: `-${source.x * ZOOM - LENS / 2}px -${source.y * ZOOM - LENS / 2}px`,
-              boxShadow: '0 0 0 4px rgba(0,0,0,0.4), 0 20px 40px -8px rgba(0,0,0,0.7), 0 0 24px -4px rgba(196,154,69,0.5)',
+              boxShadow: '0 0 0 4px rgba(0,0,0,0.4), 0 20px 40px -8px rgba(0,0,0,0.7), 0 0 24px -4px rgba(192,157,81,0.5)',
             }}
           >
             <span className={cn(

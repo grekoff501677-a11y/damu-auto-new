@@ -61,7 +61,7 @@ export function CookieConsent() {
             <div className="mt-4 flex gap-2">
               <button
                 onClick={() => decide('accepted')}
-                className="flex min-h-11 flex-1 items-center justify-center rounded-lg bg-accent px-4 text-sm font-700 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_20px_-4px_rgba(196,154,69,0.7)] cursor-pointer"
+                className="flex min-h-11 flex-1 items-center justify-center rounded-lg bg-accent px-4 text-sm font-700 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_20px_-4px_rgba(192,157,81,0.7)] cursor-pointer"
               >
                 Принять
               </button>

@@ -23,7 +23,7 @@ const MD =
   '[&_ul]:my-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-1.5 ' +
   '[&_strong]:text-foreground [&_strong]:font-700 ' +
   '[&_blockquote]:border-l-2 [&_blockquote]:border-accent [&_blockquote]:pl-4 [&_blockquote]:italic ' +
-  '[&_code]:rounded [&_code]:bg-white/10 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-sm [&_code]:font-mono ' +
+  '[&_code]:rounded [&_code]:bg-brand-white/10 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-sm [&_code]:font-mono ' +
   '[&_img]:rounded-xl [&_img]:my-6'
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {

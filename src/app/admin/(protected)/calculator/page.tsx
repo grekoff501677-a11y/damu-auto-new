@@ -71,7 +71,7 @@ export default async function AdminCalculatorPage({ searchParams }: { searchPara
                   <td className="p-3 font-600 text-foreground">{r.product_name}</td>
                   <td className="p-3">
                     <span className={cn('rounded-full px-2 py-0.5 text-[10px] font-600 uppercase',
-                      r.rule_type === 'replace' ? 'bg-accent/15 text-accent' : 'bg-amber-400/15 text-amber-400')}>
+                      r.rule_type === 'replace' ? 'bg-accent/15 text-accent' : 'bg-brand-blue-soft/15 text-brand-blue-soft')}>
                       {r.rule_type === 'replace' ? 'Замена' : 'Проверка'}
                     </span>
                   </td>

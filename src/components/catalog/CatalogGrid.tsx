@@ -17,8 +17,8 @@ type Props = {
 
 function productBg(hue: number) {
   return `radial-gradient(circle at 30% 25%, hsla(${hue},45%,55%,0.22), transparent 60%),
-          radial-gradient(circle at 75% 80%, rgba(196,154,69,0.18), transparent 55%),
-          linear-gradient(160deg, #0B253A, #061521)`
+          radial-gradient(circle at 75% 80%, rgba(192,157,81,0.18), transparent 55%),
+          linear-gradient(160deg, #28343E, #1E272F)`
 }
 
 export function CatalogGrid({ products, categories, models, initialModel }: Props) {
@@ -84,7 +84,7 @@ export function CatalogGrid({ products, categories, models, initialModel }: Prop
                       {p.models.length > 0 && (
                         <div className="absolute inset-x-0 bottom-0 translate-y-2 bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                           <div className="flex flex-wrap gap-1">
-                            {p.models.map((m) => <span key={m} className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-foreground">{m}</span>)}
+                            {p.models.map((m) => <span key={m} className="rounded-full bg-brand-white/10 px-2 py-0.5 text-[10px] text-foreground">{m}</span>)}
                           </div>
                         </div>
                       )}
@@ -113,7 +113,7 @@ export function CatalogGrid({ products, categories, models, initialModel }: Prop
                 transition={{ type: 'spring', stiffness: 260, damping: 30 }}
                 drag="y" dragConstraints={{ top: 0, bottom: 0 }} dragElastic={{ top: 0, bottom: 0.4 }}
                 onDragEnd={(_, info) => { if (info.offset.y > 120) setSelected(null) }}>
-                <div className="sticky top-0 flex justify-center pt-3 pb-1"><span className="h-1.5 w-12 rounded-full bg-white/20" /></div>
+                <div className="sticky top-0 flex justify-center pt-3 pb-1"><span className="h-1.5 w-12 rounded-full bg-brand-white/20" /></div>
                 <SheetBody product={selected} onClose={() => setSelected(null)} />
               </motion.div>
             ) : (
@@ -158,7 +158,7 @@ function SheetBody({ product, onClose }: { product: PublicProduct; onClose: () =
   return (
     <div>
       <div className="relative mx-4 aspect-[16/9] overflow-hidden rounded-2xl"
-        style={{ background: product.images[0] ? undefined : `linear-gradient(160deg,#0B253A,#061521)` }}>
+        style={{ background: product.images[0] ? undefined : `linear-gradient(160deg,#28343E,#1E272F)` }}>
         {product.images[0] && <img src={product.images[0]} alt={product.name} className="absolute inset-0 h-full w-full object-cover" />}
         <div className="absolute inset-0 grid-backdrop opacity-30" />
         <button onClick={onClose} className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full border border-glass-border bg-black/50 text-foreground backdrop-blur-md cursor-pointer">
@@ -191,7 +191,7 @@ function DetailBody({ product }: { product: PublicProduct }) {
         </div>
       )}
       <a href={product.kaspiUrl} target="_blank" rel="noopener noreferrer"
-        className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 text-sm font-700 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_24px_-4px_rgba(196,154,69,0.7)] cursor-pointer">
+        className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 text-sm font-700 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_24px_-4px_rgba(192,157,81,0.7)] cursor-pointer">
         Заказать на Kaspi.kz
         <ExternalLink className="h-4 w-4" />
       </a>

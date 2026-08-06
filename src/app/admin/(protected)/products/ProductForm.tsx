@@ -99,7 +99,7 @@ export function ProductForm({ models, initial }: Props) {
 
       <div className="flex gap-3 pt-2">
         <button onClick={submit} disabled={pending}
-          className="flex min-h-11 items-center gap-2 rounded-xl bg-accent px-5 text-sm font-700 text-accent-foreground transition-all hover:shadow-[0_0_20px_-4px_rgba(196,154,69,0.7)] disabled:opacity-50 cursor-pointer">
+          className="flex min-h-11 items-center gap-2 rounded-xl bg-accent px-5 text-sm font-700 text-accent-foreground transition-all hover:shadow-[0_0_20px_-4px_rgba(192,157,81,0.7)] disabled:opacity-50 cursor-pointer">
           {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Сохранить
         </button>

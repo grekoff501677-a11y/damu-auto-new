@@ -70,7 +70,7 @@ export function Header() {
               width={40}
               height={40}
               priority
-              className="h-10 w-10 rounded-full ring-1 ring-accent/30 transition-shadow duration-200 group-hover:shadow-[0_0_16px_-2px_rgba(196,154,69,0.6)]"
+              className="h-10 w-10 rounded-full ring-1 ring-accent/30 transition-shadow duration-200 group-hover:shadow-[0_0_16px_-2px_rgba(192,157,81,0.6)]"
             />
             <span className="font-heading text-lg font-700 tracking-tight text-foreground">
               Damu<span className="text-accent">Auto</span>
@@ -106,7 +106,7 @@ export function Header() {
               <InstagramIcon className="h-5 w-5" />
             </a>
             <a href="https://kaspi.kz" target="_blank" rel="noopener noreferrer">
-              <button className="group flex h-11 items-center gap-2 rounded-lg bg-accent px-4 text-sm font-600 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_20px_-2px_rgba(196,154,69,0.6)] cursor-pointer">
+              <button className="group flex h-11 items-center gap-2 rounded-lg bg-accent px-4 text-sm font-600 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_20px_-2px_rgba(192,157,81,0.6)] cursor-pointer">
                 <ShoppingCart className="h-4 w-4" />
                 <span className="hidden sm:inline">Kaspi.kz</span>
               </button>

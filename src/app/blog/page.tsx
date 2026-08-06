@@ -29,7 +29,7 @@ export default async function BlogPage() {
               <Link href={`/blog/${p.slug}`} className="group block h-full">
                 <article className="glass flex h-full flex-col overflow-hidden rounded-2xl transition-colors duration-200 hover:border-accent/30">
                   <div className="relative aspect-[16/9] overflow-hidden"
-                    style={{ background: p.cover_image ? undefined : 'linear-gradient(160deg,#0B253A,#061521)' }}>
+                    style={{ background: p.cover_image ? undefined : 'linear-gradient(160deg,#28343E,#1E272F)' }}>
                     {p.cover_image && <img src={p.cover_image} alt={p.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
                     <div className="absolute inset-0 grid-backdrop opacity-30" />
                     <span className="absolute left-3 top-3 rounded-full border border-accent/25 bg-black/50 px-2.5 py-1 text-[10px] font-600 text-accent backdrop-blur-md">

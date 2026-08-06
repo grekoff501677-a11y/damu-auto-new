@@ -19,7 +19,7 @@ export default async function AdminBlogPage() {
         desc={`Всего: ${posts.length}`}
         action={
           <Link href="/admin/blog/new">
-            <button className="flex min-h-11 items-center gap-2 rounded-xl bg-accent px-4 text-sm font-700 text-accent-foreground transition-all hover:shadow-[0_0_20px_-4px_rgba(196,154,69,0.7)] cursor-pointer">
+            <button className="flex min-h-11 items-center gap-2 rounded-xl bg-accent px-4 text-sm font-700 text-accent-foreground transition-all hover:shadow-[0_0_20px_-4px_rgba(192,157,81,0.7)] cursor-pointer">
               <Plus className="h-4 w-4" /> Написать
             </button>
           </Link>
@@ -41,7 +41,7 @@ export default async function AdminBlogPage() {
                   <span className="shrink-0 rounded-full border border-accent/25 bg-accent/5 px-2 py-0.5 text-[10px] text-accent">
                     {p.category === 'guide' ? 'Гид' : 'Обновление'}
                   </span>
-                  {!p.published && <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-muted-foreground">черновик</span>}
+                  {!p.published && <span className="shrink-0 rounded-full bg-brand-white/10 px-2 py-0.5 text-[10px] text-muted-foreground">черновик</span>}
                 </div>
                 {p.excerpt && <p className="mt-0.5 truncate text-xs text-muted-foreground">{p.excerpt}</p>}
               </div>

@@ -24,7 +24,7 @@ export function TiltCard({ children, className, intensity = 8, glare = true }: T
   const rotateX = useSpring(useTransform(my, [0, 1], [intensity, -intensity]), SPRING)
   const rotateY = useSpring(useTransform(mx, [0, 1], [-intensity, intensity]), SPRING)
   const glareBg = useTransform([mx, my], ([x, y]: number[]) =>
-    `radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(255,255,255,0.10), transparent 50%)`
+    `radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(248,244,237,0.10), transparent 50%)`
   )
 
   function handleMove(e: React.MouseEvent<HTMLDivElement>) {

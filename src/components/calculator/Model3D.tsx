@@ -10,7 +10,7 @@ import type { BodyNode } from './VehicleBlueprint'
 import type { Node3DRegion } from '@/lib/types'
 import { defaultRegions } from '@/lib/node-regions'
 
-const SWARM_COLOR = '#bfe9ff' // active node glow (cyan-white, distinct from gold wireframe)
+const SWARM_COLOR = '#F8F4ED' // active node glow (белый — ярче охряного каркаса)
 
 // Significant edges only: this keeps high-poly cars readable and cuts the
 // amount of generated line geometry versus drawing every triangle edge.
@@ -43,7 +43,7 @@ function WireModel({ url, modelKey, onReady }: { url: string; modelKey?: string;
     }
 
     const group = new THREE.Group()
-    const mat = new THREE.LineBasicMaterial({ color: '#CDA64E', transparent: true, opacity: 0.6 })
+    const mat = new THREE.LineBasicMaterial({ color: '#C09D51', transparent: true, opacity: 0.6 })
 
     scene.updateWorldMatrix(true, true)
     scene.traverse((o) => {
@@ -97,12 +97,12 @@ function ModelLoadingOverlay({ loaded }: { loaded: boolean }) {
     <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-4">
       <div className="min-w-[178px] rounded-2xl border border-glass-border bg-surface/75 px-4 py-3 shadow-[0_18px_60px_-30px_rgba(0,0,0,0.9)] backdrop-blur-xl">
         <div className="flex items-center gap-3">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-accent shadow-[0_0_18px_-8px_rgba(196,154,69,0.9)]">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-accent shadow-[0_0_18px_-8px_rgba(192,157,81,0.9)]">
             <Loader2 className="h-4 w-4 animate-spin" />
           </span>
           <span className="text-[11px] font-600 uppercase tracking-wide text-foreground/80">{label}</span>
         </div>
-        <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/10">
+        <div className="mt-3 h-1 overflow-hidden rounded-full bg-brand-white/10">
           <div
             className="model-progress-shimmer h-full rounded-full transition-[width] duration-300"
             style={{ width: `${active ? visibleProgress : 100}%` }}

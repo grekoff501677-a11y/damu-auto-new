@@ -19,7 +19,7 @@ export default async function AdminBlueprintsPage() {
           const count = Array.isArray(m.blueprint_nodes) ? m.blueprint_nodes.length : 0
           const has = !!m.blueprint_url
           return (
-            <Link key={m.id} href={`/admin/blueprints/${m.id}`} className="flex items-center gap-4 p-4 cursor-pointer hover:bg-white/[0.02]">
+            <Link key={m.id} href={`/admin/blueprints/${m.id}`} className="flex items-center gap-4 p-4 cursor-pointer hover:bg-brand-white/[0.02]">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
                 <Car className="h-5 w-5" />
               </span>

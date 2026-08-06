@@ -6,7 +6,16 @@
 
 /* ============================================================
    DAMU AUTO — Brand Theme
-   Deep Oceanic Midnight Blue · Noble Gold/Bronze accents
+   Фирменная палитра (из знака damu auto):
+     синий   #28343E   охра  #C09D51   голубой #5F788D
+     беж     #E3D3B3   белый #F8F4ED
+
+   Холст и подложки — это тот же «синий», взятый на других
+   светлотах: он ровно hsl(207 22% 20%), поэтому шкала
+   15% → 20% → 25% даёт #1E272F / #28343E / #32414E.
+   Голубой держим как декоративный (линии, сетка, иконки):
+   на тёмном фоне он даёт 3.3:1 и для текста не годится —
+   для текста берём его же осветлённый тон #A9B9C6 (7.5:1).
    ============================================================ */
 
 @theme inline {
@@ -33,9 +42,13 @@
   --color-gold-soft: var(--gold-soft);
 
   /* Direct corporate brand tokens (Damu Auto identity) */
-  --color-brand-deep: #061521;   /* deepest midnight */
-  --color-brand-navy: #0B253A;   /* oceanic panel */
-  --color-brand-gold: #C49A45;   /* noble gold / bronze */
+  --color-brand-deep:      #1E272F;   /* синий, тёмная ступень — холст */
+  --color-brand-navy:      #28343E;   /* синий — панели и карточки */
+  --color-brand-gold:      #C09D51;   /* охра */
+  --color-brand-blue:      #5F788D;   /* голубой — только декор */
+  --color-brand-blue-soft: #A9B9C6;   /* осветлённый голубой — текст */
+  --color-brand-beige:     #E3D3B3;   /* беж */
+  --color-brand-white:     #F8F4ED;   /* белый */
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
@@ -60,45 +73,45 @@
 }
 
 :root {
-  /* ── Deep oceanic midnight canvas ── */
-  --background:        #061521;   /* deepest midnight */
-  --foreground:        #FFFFFF;   /* pure white */
+  /* ── Холст: «синий» на светлоте 15% ── */
+  --background:        #1E272F;   /* синий, тёмная ступень */
+  --foreground:        #F8F4ED;   /* белый */
 
-  --surface:           #0B253A;   /* oceanic panel */
-  --surface-raised:    #0E2A42;   /* raised card */
-  --glass-border:      rgba(196, 154, 69, 0.12);
+  --surface:           #28343E;   /* синий — панель */
+  --surface-raised:    #32414E;   /* синий, светлая ступень */
+  --glass-border:      rgba(192, 157, 81, 0.14);
 
-  --card:              #0B253A;
-  --card-foreground:   #FFFFFF;
-  --popover:           #0B253A;
-  --popover-foreground:#FFFFFF;
+  --card:              #28343E;
+  --card-foreground:   #F8F4ED;
+  --popover:           #28343E;
+  --popover-foreground:#F8F4ED;
 
   /* Primary = bright surface for solid light buttons */
-  --primary:           #FFFFFF;
-  --primary-foreground:#061521;
+  --primary:           #F8F4ED;
+  --primary-foreground:#1E272F;
 
-  --secondary:         #0E2A42;
-  --secondary-foreground: #FFFFFF;
+  --secondary:         #32414E;
+  --secondary-foreground: #F8F4ED;
 
-  --muted:             #0E2A42;
-  --muted-foreground:  #94A3B8;   /* desaturated blue-gray */
+  --muted:             #32414E;
+  --muted-foreground:  #A9B9C6;   /* осветлённый голубой, 7.5:1 */
 
-  /* Accent = Noble Gold / Automotive Bronze */
-  --accent:            #C49A45;
-  --accent-foreground: #0B1A28;   /* dark ink on gold */
-  --gold-soft:         #D9B870;   /* lighter gold for gradients */
+  /* Accent = охра */
+  --accent:            #C09D51;
+  --accent-foreground: #1E272F;   /* тёмный текст на охре, 5.9:1 */
+  --gold-soft:         #E3D3B3;   /* беж — светлый край градиентов */
 
-  --destructive:       #E5685F;
+  --destructive:       #E5685F;   /* вне палитры: сигнал об ошибке */
 
-  --border:            rgba(196, 154, 69, 0.10);
-  --input:             rgba(196, 154, 69, 0.18);
-  --ring:              #C49A45;
+  --border:            rgba(192, 157, 81, 0.12);
+  --input:             rgba(192, 157, 81, 0.20);
+  --ring:              #C09D51;
 
-  --chart-1:           #C49A45;
-  --chart-2:           #D9B870;
-  --chart-3:           #6B8CAE;
-  --chart-4:           #94A3B8;
-  --chart-5:           #0E2A42;
+  --chart-1:           #C09D51;
+  --chart-2:           #E3D3B3;
+  --chart-3:           #5F788D;
+  --chart-4:           #A9B9C6;
+  --chart-5:           #32414E;
 
   --radius:            0.75rem;
 }
@@ -119,11 +132,11 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    /* warm golden ambient glow over oceanic base */
+    /* тёплое свечение охры поверх синей основы */
     background-image:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(196, 154, 69, 0.10), transparent 60%),
-      radial-gradient(ellipse 70% 50% at 90% 5%, rgba(11, 37, 58, 0.6), transparent 60%),
-      linear-gradient(180deg, #061521 0%, #07192a 100%);
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(192, 157, 81, 0.10), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 90% 5%, rgba(40, 52, 62, 0.6), transparent 60%),
+      linear-gradient(180deg, #1E272F 0%, #222C35 100%);
     background-attachment: fixed;
   }
   h1, h2, h3, h4 {
@@ -137,32 +150,32 @@
    ============================================================ */
 
 .glass {
-  background: rgba(11, 37, 58, 0.55);
+  background: rgba(40, 52, 62, 0.55);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
 }
 .glass-strong {
-  background: rgba(6, 21, 33, 0.85);
+  background: rgba(30, 39, 47, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
 }
 
-/* Warm golden LED glow */
+/* Тёплое свечение охры */
 .glow-accent {
-  box-shadow: 0 0 0 1px rgba(196, 154, 69, 0.25),
-              0 8px 30px -8px rgba(196, 154, 69, 0.45);
+  box-shadow: 0 0 0 1px rgba(192, 157, 81, 0.25),
+              0 8px 30px -8px rgba(192, 157, 81, 0.45);
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #FFFFFF 0%, #94A3B8 100%);
+  background: linear-gradient(135deg, #F8F4ED 0%, #A9B9C6 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 .text-gold-gradient {
-  background: linear-gradient(135deg, #D9B870 0%, #C49A45 100%);
+  background: linear-gradient(135deg, #E3D3B3 0%, #C09D51 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -171,8 +184,8 @@
 /* Blueprint grid backdrop */
 .grid-backdrop {
   background-image:
-    linear-gradient(rgba(196,154,69,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(196,154,69,0.04) 1px, transparent 1px);
+    linear-gradient(rgba(192,157,81,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(192,157,81,0.04) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
@@ -183,7 +196,7 @@
   92%, 100% { background-position: -30% 0; }
 }
 .shimmer-gold {
-  background: linear-gradient(100deg, #C49A45 42%, #F1DFAE 50%, #C49A45 58%);
+  background: linear-gradient(100deg, #C09D51 42%, #F8F4ED 50%, #C09D51 58%);
   background-size: 300% 100%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -196,9 +209,10 @@
   100% { background-position: -40% 0; }
 }
 .model-progress-shimmer {
-  background: linear-gradient(100deg, #9D7330 0%, #C49A45 30%, #F6E8B8 48%, #D9B870 60%, #C49A45 78%, #8A6429 100%);
+  /* тёмные края — та же охра на светлоте 30% и 36% */
+  background: linear-gradient(100deg, #715A29 0%, #C09D51 30%, #F8F4ED 48%, #E3D3B3 60%, #C09D51 78%, #876C31 100%);
   background-size: 240% 100%;
-  box-shadow: 0 0 14px rgba(196,154,69,0.75), inset 0 0 6px rgba(255,255,255,0.22);
+  box-shadow: 0 0 14px rgba(192,157,81,0.75), inset 0 0 6px rgba(248,244,237,0.22);
   animation: progress-shimmer-sweep 1.45s ease-in-out infinite;
 }
 
@@ -218,13 +232,13 @@
 }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #061521; }
+::-webkit-scrollbar-track { background: #1E272F; }
 ::-webkit-scrollbar-thumb {
-  background: #1a3a52;
+  background: #32414E;
   border-radius: 8px;
-  border: 2px solid #061521;
+  border: 2px solid #1E272F;
 }
-::-webkit-scrollbar-thumb:hover { background: #C49A45; }
+::-webkit-scrollbar-thumb:hover { background: #C09D51; }
 
 /* hide scrollbar for carousels */
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils'
 
 const baseInput =
-  'w-full rounded-xl border border-input bg-surface/60 px-4 py-2.5 text-sm text-foreground outline-none transition-all duration-200 focus:border-accent focus:shadow-[0_0_0_3px_rgba(196,154,69,0.14)] min-h-11'
+  'w-full rounded-xl border border-input bg-surface/60 px-4 py-2.5 text-sm text-foreground outline-none transition-all duration-200 focus:border-accent focus:shadow-[0_0_0_3px_rgba(192,157,81,0.14)] min-h-11'
 
 export function Label({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) {
   return <label htmlFor={htmlFor} className="mb-1.5 block text-xs font-600 text-muted-foreground">{children}</label>
@@ -54,8 +54,8 @@ export function Toggle({ label, checked, onChange }: { label: string; checked: b
   return (
     <button type="button" onClick={() => onChange(!checked)}
       className="flex items-center gap-2.5 cursor-pointer">
-      <span className={cn('relative h-6 w-11 rounded-full transition-colors', checked ? 'bg-accent' : 'bg-white/10')}>
-        <span className={cn('absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform', checked ? 'translate-x-5' : 'translate-x-0.5')} />
+      <span className={cn('relative h-6 w-11 rounded-full transition-colors', checked ? 'bg-accent' : 'bg-brand-white/10')}>
+        <span className={cn('absolute top-0.5 h-5 w-5 rounded-full bg-brand-white transition-transform', checked ? 'translate-x-5' : 'translate-x-0.5')} />
       </span>
       <span className="text-sm text-foreground">{label}</span>
     </button>

@@ -127,7 +127,7 @@ export function BlueprintEditor({
           style={{ cursor: drag ? 'grabbing' : 'crosshair', minHeight: 280 }}
         >
           <div aria-hidden className="pointer-events-none absolute inset-0"
-            style={{ background: 'radial-gradient(ellipse 62% 48% at 50% 56%, rgba(196,154,69,0.18), transparent 72%)' }} />
+            style={{ background: 'radial-gradient(ellipse 62% 48% at 50% 56%, rgba(192,157,81,0.18), transparent 72%)' }} />
           {url
             // eslint-disable-next-line @next/next/no-img-element
             ? <img src={url} alt="" className="pointer-events-none relative block h-auto w-full" />
@@ -137,7 +137,7 @@ export function BlueprintEditor({
           <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             {hotspots.filter((h) => h.line).map((h) => {
               const on = preview && !!h.bodyNode
-              const stroke = on ? '#9FE0FF' : 'rgba(196,154,69,0.6)'
+              const stroke = on ? '#F8F4ED' : 'rgba(192,157,81,0.6)'
               return <path key={h.id} d={leaderLinePath(h)!} fill="none" stroke={stroke} strokeWidth={1}
                 vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />
             })}
@@ -160,10 +160,10 @@ export function BlueprintEditor({
                 >
                   <span className="block rounded-full" style={
                     on
-                      ? { width: 14, height: 14, border: '2px solid #9FE0FF', background: 'rgba(56,189,248,0.12)', boxShadow: '0 0 0 1px rgba(6,21,33,0.9), 0 0 14px 3px rgba(56,189,248,0.7)' }
-                      : { width: 14, height: 14, border: `2px solid ${h.bodyNode ? 'rgba(214,232,250,0.5)' : 'rgba(196,154,69,0.8)'}`, background: 'transparent', boxShadow: '0 0 0 1px rgba(6,21,33,0.7)' }
+                      ? { width: 14, height: 14, border: '2px solid #F8F4ED', background: 'rgba(248,244,237,0.12)', boxShadow: '0 0 0 1px rgba(30,39,47,0.9), 0 0 14px 3px rgba(227,211,179,0.7)' }
+                      : { width: 14, height: 14, border: `2px solid ${h.bodyNode ? 'rgba(169,185,198,0.5)' : 'rgba(192,157,81,0.8)'}`, background: 'transparent', boxShadow: '0 0 0 1px rgba(30,39,47,0.7)' }
                   } />
-                  {isSel && <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-sky-300" style={{ width: 26, height: 26 }} />}
+                  {isSel && <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-brand-blue-soft" style={{ width: 26, height: 26 }} />}
                 </button>
 
                 {/* line endpoint handle */}
@@ -174,7 +174,7 @@ export function BlueprintEditor({
                     className="absolute -translate-x-1/2 -translate-y-1/2 cursor-grab"
                     style={{ left: `${h.line.x2}%`, top: `${h.line.y2}%` }}
                   >
-                    <span className="block rounded-sm bg-sky-300" style={{ width: 8, height: 8, boxShadow: '0 0 0 2px #061521' }} />
+                    <span className="block rounded-sm bg-brand-blue-soft" style={{ width: 8, height: 8, boxShadow: '0 0 0 2px #1E272F' }} />
                   </button>
                 )}
 
@@ -187,7 +187,7 @@ export function BlueprintEditor({
                     style={{ left: `${h.line.cx}%`, top: `${h.line.cy}%` }}
                     title={h.line.kind === 'elbow' ? 'Угол излома' : 'Точка изгиба'}
                   >
-                    <span className="block rotate-45 bg-amber-300" style={{ width: 9, height: 9, boxShadow: '0 0 0 2px #061521' }} />
+                    <span className="block rotate-45 bg-accent" style={{ width: 9, height: 9, boxShadow: '0 0 0 2px #1E272F' }} />
                   </button>
                 )}
 
@@ -215,7 +215,7 @@ export function BlueprintEditor({
             <Plus className="h-4 w-4" /> Точка
           </button>
           <button onClick={() => setPreview((v) => !v)} title="Предпросмотр свечения"
-            className={cn('flex h-10 w-10 items-center justify-center rounded-lg border cursor-pointer', preview ? 'border-sky-300/40 text-sky-300' : 'border-input text-muted-foreground')}>
+            className={cn('flex h-10 w-10 items-center justify-center rounded-lg border cursor-pointer', preview ? 'border-brand-blue-soft/40 text-brand-blue-soft' : 'border-input text-muted-foreground')}>
             {preview ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
           </button>
         </div>
@@ -252,7 +252,7 @@ export function BlueprintEditor({
             <div className="flex items-center gap-2">
               <button onClick={() => toggleLine(sel)}
                 className={cn('flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg border text-sm font-600 cursor-pointer',
-                  sel.line ? 'border-sky-300/40 text-sky-300' : 'border-input text-muted-foreground hover:border-accent/40')}>
+                  sel.line ? 'border-brand-blue-soft/40 text-brand-blue-soft' : 'border-input text-muted-foreground hover:border-accent/40')}>
                 <Spline className="h-4 w-4" /> {sel.line ? 'Убрать линию' : 'Выноска'}
               </button>
               <button onClick={() => remove(sel.id)}
@@ -274,7 +274,7 @@ export function BlueprintEditor({
                     {opts.map(({ k, label, Icon }) => (
                       <button key={k} onClick={() => setLineKind(sel, k)}
                         className={cn('flex min-h-9 items-center justify-center gap-1 rounded-lg border text-xs font-600 cursor-pointer',
-                          kind === k ? 'border-amber-300/40 bg-amber-300/10 text-amber-300' : 'border-input text-muted-foreground hover:border-accent/40')}>
+                          kind === k ? 'border-accent/40 bg-accent/10 text-accent' : 'border-input text-muted-foreground hover:border-accent/40')}>
                         <Icon className="h-3.5 w-3.5" /> {label}
                       </button>
                     ))}
@@ -293,7 +293,7 @@ export function BlueprintEditor({
 
         {error && <p className="text-sm text-destructive">{error}</p>}
         <button onClick={onSave} disabled={pending}
-          className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 text-sm font-700 text-accent-foreground transition-all hover:shadow-[0_0_20px_-4px_rgba(196,154,69,0.7)] disabled:opacity-50 cursor-pointer">
+          className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 text-sm font-700 text-accent-foreground transition-all hover:shadow-[0_0_20px_-4px_rgba(192,157,81,0.7)] disabled:opacity-50 cursor-pointer">
           {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <Check className="h-4 w-4" /> : <Save className="h-4 w-4" />}
           {saved ? 'Сохранено' : 'Сохранить схему'}
         </button>

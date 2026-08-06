@@ -284,7 +284,7 @@ function BlockEditor({ item, def, onSaved }: {
 
       <div className="flex items-center gap-2">
         <button onClick={save} disabled={pending}
-          className="flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-accent px-4 text-sm font-700 text-accent-foreground transition-all hover:shadow-[0_0_20px_-4px_rgba(196,154,69,0.7)] disabled:opacity-50 cursor-pointer">
+          className="flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-accent px-4 text-sm font-700 text-accent-foreground transition-all hover:shadow-[0_0_20px_-4px_rgba(192,157,81,0.7)] disabled:opacity-50 cursor-pointer">
           {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <Check className="h-4 w-4" /> : <Save className="h-4 w-4" />}
           {saved ? 'Сохранено' : 'Сохранить'}
         </button>

@@ -78,7 +78,7 @@ function renderHero(c: SectionConfig, { carModels }: Ctx) {
 
         <Reveal>
           <span className="inline-flex items-center gap-2 rounded-full border border-glass-border bg-surface/60 px-3 py-1 text-xs font-500 text-muted-foreground backdrop-blur-md">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgba(196,154,69,0.6)]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_2px_rgba(192,157,81,0.6)]" />
             {str(c, 'badge')}
           </span>
         </Reveal>
@@ -98,7 +98,7 @@ function renderHero(c: SectionConfig, { carModels }: Ctx) {
         <Reveal delay={0.24}>
           <div className="mt-8 flex flex-wrap gap-3">
             <SmartLink href={str(c, 'ctaPrimaryHref') || '/catalog'}>
-              <button className="group flex min-h-12 items-center gap-2 rounded-xl bg-accent px-6 text-sm font-700 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_28px_-4px_rgba(196,154,69,0.7)] cursor-pointer">
+              <button className="group flex min-h-12 items-center gap-2 rounded-xl bg-accent px-6 text-sm font-700 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_28px_-4px_rgba(192,157,81,0.7)] cursor-pointer">
                 {str(c, 'ctaPrimary')}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </button>
@@ -244,7 +244,7 @@ function renderBanner(c: SectionConfig) {
           </div>
           {c.buttonOn !== false && str(c, 'buttonLabel') && (
             <SmartLink href={str(c, 'buttonHref') || '/'}>
-              <button className="group flex min-h-12 shrink-0 items-center gap-2 rounded-xl bg-accent px-6 text-sm font-700 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_28px_-4px_rgba(196,154,69,0.7)] cursor-pointer">
+              <button className="group flex min-h-12 shrink-0 items-center gap-2 rounded-xl bg-accent px-6 text-sm font-700 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_28px_-4px_rgba(192,157,81,0.7)] cursor-pointer">
                 {str(c, 'buttonLabel')}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </button>

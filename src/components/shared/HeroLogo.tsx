@@ -41,7 +41,7 @@ export function HeroLogo({ className }: { className?: string }) {
         <img
           src={LOGO} alt="" aria-hidden loading="lazy" decoding="async"
           className={LOGO_BOX}
-          style={{ filter: 'brightness(1.2) drop-shadow(0 0 12px rgba(244,226,180,0.3))' }}
+          style={{ filter: 'brightness(1.2) drop-shadow(0 0 12px rgba(227,211,179,0.3))' }}
         />
       </div>
 
@@ -53,7 +53,7 @@ export function HeroLogo({ className }: { className?: string }) {
           height={SIZE}
           strokeWidth={2.5}
           baseColor="transparent"
-          gradientColors={['#F1DFAE', '#E7C984', '#C49A45']}
+          gradientColors={['#F8F4ED', '#E3D3B3', '#C09D51']}
           animationDuration={4}
           path={CIRCLE}
         />

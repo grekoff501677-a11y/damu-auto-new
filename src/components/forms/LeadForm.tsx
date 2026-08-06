@@ -124,7 +124,7 @@ export function LeadForm({ source = 'website', className }: Props) {
       <button
         type="submit"
         disabled={!canSubmit}
-        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 text-sm font-700 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_24px_-4px_rgba(196,154,69,0.7)] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none cursor-pointer"
+        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 text-sm font-700 text-accent-foreground transition-all duration-200 hover:shadow-[0_0_24px_-4px_rgba(192,157,81,0.7)] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none cursor-pointer"
       >
         {status === 'loading' ? (
           <><Loader2 className="h-4 w-4 animate-spin" /> Отправка…</>
@@ -154,7 +154,7 @@ function Field({
     placeholder: ' ',
     className: cn(
       'peer w-full rounded-xl border bg-surface/60 px-4 pt-6 pb-2 text-sm text-foreground outline-none transition-all duration-200',
-      focused ? 'border-accent shadow-[0_0_0_3px_rgba(196,154,69,0.14)]' : 'border-input hover:border-accent/30'
+      focused ? 'border-accent shadow-[0_0_0_3px_rgba(192,157,81,0.14)]' : 'border-input hover:border-accent/30'
     ),
   }
 

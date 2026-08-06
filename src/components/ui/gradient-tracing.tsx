@@ -19,7 +19,7 @@ export const GradientTracing: React.FC<GradientTracingProps> = ({
   width,
   height,
   baseColor = "black",
-  gradientColors = ["#2EB9DF", "#2EB9DF", "#9E00FF"],
+  gradientColors = ["#F8F4ED", "#E3D3B3", "#C09D51"],
   animationDuration = 2,
   strokeWidth = 2,
   path = `M0,${height / 2} L${width},${height / 2}`,

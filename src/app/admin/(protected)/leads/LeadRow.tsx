@@ -8,8 +8,8 @@ import { cn } from '@/lib/utils'
 
 const STATUS: { value: LeadStatus; label: string; cls: string }[] = [
   { value: 'new',       label: 'Новая',      cls: 'bg-accent/15 text-accent border-accent/30' },
-  { value: 'contacted', label: 'В работе',   cls: 'bg-sky-400/15 text-sky-300 border-sky-400/30' },
-  { value: 'closed',    label: 'Закрыта',    cls: 'bg-white/10 text-muted-foreground border-glass-border' },
+  { value: 'contacted', label: 'В работе',   cls: 'bg-brand-blue-soft/15 text-brand-blue-soft border-brand-blue-soft/30' },
+  { value: 'closed',    label: 'Закрыта',    cls: 'bg-brand-white/10 text-muted-foreground border-glass-border' },
 ]
 
 export function LeadRow({ lead }: { lead: Lead }) {
