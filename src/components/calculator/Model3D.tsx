@@ -6,11 +6,22 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'rea
 import * as THREE from 'three'
 import { Loader2, RotateCw } from 'lucide-react'
 import { NodeSwarm } from './NodeSwarm'
+import { PartModel } from './PartModel'
 import type { BodyNode } from './VehicleBlueprint'
 import type { Node3DRegion } from '@/lib/types'
 import { defaultRegions } from '@/lib/node-regions'
 
 const SWARM_COLOR = '#F8F4ED' // active node glow (белый — ярче охряного каркаса)
+
+// Масляный фильтр: STEP из SolidWorks → GLB (см. scripts/prep-part-glb.mjs),
+// лежит в том же бакете "models", что и кузова.
+const OIL_FILTER_URL =
+  'https://ekrggwfddacgeolxtuwd.supabase.co/storage/v1/object/public/models/oil-filter.glb'
+
+// Реальный фильтр — ~90 мм против 4.6 м кузова, то есть 5% его высоты: в кадре
+// это несколько пикселей. Увеличиваем примерно впятеро — обычная условность
+// схемы, зато деталь видно и в неё можно попасть курсором.
+const FILTER_SCALE = 0.42
 
 // Significant edges only: this keeps high-poly cars readable and cuts the
 // amount of generated line geometry versus drawing every triangle edge.
@@ -132,11 +143,29 @@ export function Model3D({ src, modelKey, className, activeNodes = [], nodes }: {
   const [dprMax] = useState(() =>
     typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches ? 1 : 1.5)
 
+  // деталь под курсором — на это время гасим автовращение, иначе в неё не попасть
+  const [partHovered, setPartHovered] = useState(false)
+
   // hand-authored regions from DB, else generic defaults from the model bbox
   const regions = useMemo<Node3DRegion[]>(() => {
     if (nodes && nodes.length) return nodes
     return normSize ? defaultRegions(normSize) : []
   }, [nodes, normSize])
+
+  // Фильтр не прибиваем к координатам, а привязываем к узлу двигателя: если
+  // регионы переразметят в админ-редакторе, деталь останется под мотором.
+  const filter = useMemo(() => {
+    const engine = regions.find((r) => r.bodyNode === 'engine')
+    if (!engine) return null
+    const reach = engine.shape === 'box'
+      ? Math.min(engine.sx ?? 0.5, engine.sy ?? 0.5, engine.sz ?? 0.5)
+      : engine.r ?? 0.5
+    return {
+      // вбок от осевой, вниз под блок и чуть вперёд — где фильтр и стоит
+      position: [engine.x + reach * 0.36, engine.y - reach * 0.45, engine.z + reach * 0.15] as [number, number, number],
+      height: reach * FILTER_SCALE,
+    }
+  }, [regions])
 
   useEffect(() => {
     let r2 = 0
@@ -174,14 +203,33 @@ export function Model3D({ src, modelKey, className, activeNodes = [], nodes }: {
             gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
             style={{ background: 'transparent' }}
           >
+            {/* Каркас и рой точек светом не освещаются (LineBasicMaterial и
+                ShaderMaterial — unlit), так что свет здесь работает только на
+                деталь и вид кузова не меняет. */}
+            <ambientLight intensity={0.75} />
+            <directionalLight position={[4, 6, 3]} intensity={1.5} />
+            <directionalLight position={[-4, 2, -3]} intensity={0.45} color="#8FA0AE" />
+
             <Suspense fallback={null}>
               <WireModel url={src} modelKey={modelKey} onReady={onReady} />
             </Suspense>
             {regions.map((r) => (
               <NodeSwarm key={r.id} region={r} color={SWARM_COLOR} active={activeNodes.includes(r.bodyNode)} />
             ))}
+            {filter && (
+              <Suspense fallback={null}>
+                <PartModel
+                  url={OIL_FILTER_URL}
+                  position={filter.position}
+                  height={filter.height}
+                  label="Масляный фильтр"
+                  active={activeNodes.includes('engine')}
+                  onHoverChange={setPartHovered}
+                />
+              </Suspense>
+            )}
             <OrbitControls
-              autoRotate
+              autoRotate={!partHovered}
               autoRotateSpeed={0.7}
               enableDamping
               enablePan={false}
