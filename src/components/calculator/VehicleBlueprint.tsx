@@ -86,8 +86,8 @@ export function VehicleBlueprint({ active, className, blueprint }: Props) {
                     border: `2px solid ${ring}`,
                     background: on ? 'rgba(248,244,237,0.12)' : 'transparent',
                     boxShadow: on
-                      ? '0 0 0 1px rgba(30,39,47,0.9), 0 0 14px 3px rgba(227,211,179,0.7)'
-                      : '0 0 0 1px rgba(30,39,47,0.7)',
+                      ? '0 0 0 1px rgba(8,22,33,0.9), 0 0 14px 3px rgba(227,211,179,0.7)'
+                      : '0 0 0 1px rgba(8,22,33,0.7)',
                   }}
                 />
               </div>

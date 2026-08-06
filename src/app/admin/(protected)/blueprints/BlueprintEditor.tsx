@@ -160,8 +160,8 @@ export function BlueprintEditor({
                 >
                   <span className="block rounded-full" style={
                     on
-                      ? { width: 14, height: 14, border: '2px solid #F8F4ED', background: 'rgba(248,244,237,0.12)', boxShadow: '0 0 0 1px rgba(30,39,47,0.9), 0 0 14px 3px rgba(227,211,179,0.7)' }
-                      : { width: 14, height: 14, border: `2px solid ${h.bodyNode ? 'rgba(169,185,198,0.5)' : 'rgba(192,157,81,0.8)'}`, background: 'transparent', boxShadow: '0 0 0 1px rgba(30,39,47,0.7)' }
+                      ? { width: 14, height: 14, border: '2px solid #F8F4ED', background: 'rgba(248,244,237,0.12)', boxShadow: '0 0 0 1px rgba(8,22,33,0.9), 0 0 14px 3px rgba(227,211,179,0.7)' }
+                      : { width: 14, height: 14, border: `2px solid ${h.bodyNode ? 'rgba(169,185,198,0.5)' : 'rgba(192,157,81,0.8)'}`, background: 'transparent', boxShadow: '0 0 0 1px rgba(8,22,33,0.7)' }
                   } />
                   {isSel && <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-brand-blue-soft" style={{ width: 26, height: 26 }} />}
                 </button>
@@ -174,7 +174,7 @@ export function BlueprintEditor({
                     className="absolute -translate-x-1/2 -translate-y-1/2 cursor-grab"
                     style={{ left: `${h.line.x2}%`, top: `${h.line.y2}%` }}
                   >
-                    <span className="block rounded-sm bg-brand-blue-soft" style={{ width: 8, height: 8, boxShadow: '0 0 0 2px #1E272F' }} />
+                    <span className="block rounded-sm bg-brand-blue-soft" style={{ width: 8, height: 8, boxShadow: '0 0 0 2px #081621' }} />
                   </button>
                 )}
 
@@ -187,7 +187,7 @@ export function BlueprintEditor({
                     style={{ left: `${h.line.cx}%`, top: `${h.line.cy}%` }}
                     title={h.line.kind === 'elbow' ? 'Угол излома' : 'Точка изгиба'}
                   >
-                    <span className="block rotate-45 bg-accent" style={{ width: 9, height: 9, boxShadow: '0 0 0 2px #1E272F' }} />
+                    <span className="block rotate-45 bg-accent" style={{ width: 9, height: 9, boxShadow: '0 0 0 2px #081621' }} />
                   </button>
                 )}
 

@@ -18,7 +18,7 @@ type Props = {
 function productBg(hue: number) {
   return `radial-gradient(circle at 30% 25%, hsla(${hue},45%,55%,0.22), transparent 60%),
           radial-gradient(circle at 75% 80%, rgba(192,157,81,0.18), transparent 55%),
-          linear-gradient(160deg, #28343E, #1E272F)`
+          linear-gradient(160deg, #28343E, #081621)`
 }
 
 export function CatalogGrid({ products, categories, models, initialModel }: Props) {
@@ -158,7 +158,7 @@ function SheetBody({ product, onClose }: { product: PublicProduct; onClose: () =
   return (
     <div>
       <div className="relative mx-4 aspect-[16/9] overflow-hidden rounded-2xl"
-        style={{ background: product.images[0] ? undefined : `linear-gradient(160deg,#28343E,#1E272F)` }}>
+        style={{ background: product.images[0] ? undefined : `linear-gradient(160deg,#28343E,#081621)` }}>
         {product.images[0] && <img src={product.images[0]} alt={product.name} className="absolute inset-0 h-full w-full object-cover" />}
         <div className="absolute inset-0 grid-backdrop opacity-30" />
         <button onClick={onClose} className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full border border-glass-border bg-black/50 text-foreground backdrop-blur-md cursor-pointer">

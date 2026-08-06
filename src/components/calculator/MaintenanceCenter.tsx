@@ -69,7 +69,7 @@ export function MaintenanceCenter({ models }: { models: PublicMaintModel[] }) {
             }} />
           {/* edge vignette so the car reads against the fog */}
           <div className="pointer-events-none absolute inset-0"
-            style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 52%, transparent 40%, rgba(30,39,47,0.5) 100%)' }} />
+            style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 52%, transparent 40%, rgba(8,22,33,0.5) 100%)' }} />
           <div className={cn('relative flex h-full min-h-[300px] items-center justify-center p-4 sm:p-6', !hasMilestones && 'min-h-[440px]')}>
             {model?.model3dUrl ? (
               <Model3D
