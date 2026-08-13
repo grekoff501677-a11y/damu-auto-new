@@ -17,6 +17,9 @@ export async function saveParts3D(modelId: string, parts: Part3DPlacement[]) {
     // кузов нормализован в 3.4 по длинной оси, так что за ±2.5 уходить незачем
     x: coord(p.x), y: coord(p.y), z: coord(p.z),
     height: round(Math.min(1.5, Math.max(0.02, num(p.height, 0.2)))),
+    glowRadius: round(Math.min(6, Math.max(0, num(p.glowRadius, 1.4)))),
+    // потолок по частицам — чтобы из админки нельзя было положить мобильный GPU
+    glowDensity: Math.round(Math.min(800, Math.max(0, num(p.glowDensity, 120)))),
     ...(p.bodyNode && BODY_NODES.includes(p.bodyNode) ? { bodyNode: p.bodyNode } : {}),
   })).filter((p) => p.url)
 

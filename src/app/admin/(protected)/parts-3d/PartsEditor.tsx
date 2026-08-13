@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Plus, Trash2, Save, Box } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, Save, Box, Move } from 'lucide-react'
 import { Model3D } from '@/components/calculator/Model3D'
 import { baseInput } from '@/components/admin/AdminField'
 import { cn } from '@/lib/utils'
@@ -43,7 +43,10 @@ export function PartsEditor({ model }: { model: CarModel }) {
     const id = `part-${Date.now().toString(36)}`
     // ставим у передней части, примерно на уровне моторного отсека — дальше
     // двигают ползунками, глядя на превью
-    const fresh: Part3DPlacement = { id, label: 'Масляный фильтр', url: '', x: 0.15, y: -0.2, z: 1.1, height: 0.18, bodyNode: 'engine' }
+    const fresh: Part3DPlacement = {
+      id, label: 'Масляный фильтр', url: '', x: 0.15, y: -0.2, z: 1.1, height: 0.18,
+      bodyNode: 'engine', glowRadius: 1.4, glowDensity: 120,
+    }
     setParts((prev) => [...prev, fresh])
     setSelectedId(id)
   }
@@ -75,9 +78,10 @@ export function PartsEditor({ model }: { model: CarModel }) {
       </div>
 
       <h1 className="mb-1 font-heading text-xl font-700">{model.brand} {model.name}</h1>
-      <p className="mb-6 text-sm text-muted-foreground">
-        Двигайте ползунки и смотрите на превью — деталь встаёт туда, куда поставите.
-        Подсветка в превью включена, чтобы деталь было видно насквозь каркаса.
+      <p className="mb-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+        <Move className="h-4 w-4 shrink-0 text-accent" />
+        Тащите деталь курсором прямо в превью — она идёт в плоскости экрана.
+        Чтобы задать глубину, поверните машину и потащите ещё раз. Ползунки — для точной подгонки.
       </p>
 
       {!model.model_3d_url && (
@@ -97,6 +101,9 @@ export function PartsEditor({ model }: { model: CarModel }) {
               activeNodes={NODES.map((n) => n.value)}
               nodes={model.model_3d_nodes}
               parts={parts.filter((p) => p.url)}
+              showNodeSwarms={false}
+              draggablePartId={selectedId}
+              onPartMove={(id, [x, y, z]) => patch(id, { x, y, z })}
             />
           ) : (
             <div className="flex h-[460px] items-center justify-center text-sm text-muted-foreground">Нет 3D-модели</div>
@@ -164,6 +171,16 @@ export function PartsEditor({ model }: { model: CarModel }) {
               ))}
               <Slider label="Размер" hint="высота детали" min={0.03} max={0.8} step={0.01}
                 value={selected.height} onChange={(v) => patch(selected.id, { height: v })} />
+
+              <div className="border-t border-glass-border pt-4">
+                <p className="mb-3 text-xs font-600 uppercase tracking-widest text-muted-foreground">Свечение детали</p>
+                <div className="space-y-4">
+                  <Slider label="Объём" hint="радиус облака искр" min={0} max={4} step={0.05}
+                    value={selected.glowRadius ?? 1.4} onChange={(v) => patch(selected.id, { glowRadius: v })} />
+                  <Slider label="Густота" hint="число частиц" min={0} max={600} step={10} digits={0}
+                    value={selected.glowDensity ?? 120} onChange={(v) => patch(selected.id, { glowDensity: v })} />
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -172,15 +189,15 @@ export function PartsEditor({ model }: { model: CarModel }) {
   )
 }
 
-function Slider({ label, hint, min, max, step, value, onChange }: {
+function Slider({ label, hint, min, max, step, value, onChange, digits = 2 }: {
   label: string; hint: string; min: number; max: number; step: number
-  value: number; onChange: (v: number) => void
+  value: number; onChange: (v: number) => void; digits?: number
 }) {
   return (
     <label className="block">
       <span className="mb-1 flex items-baseline justify-between text-xs">
         <span className="text-muted-foreground">{label} <span className="opacity-60">· {hint}</span></span>
-        <span className="font-mono text-foreground">{value.toFixed(2)}</span>
+        <span className="font-mono text-foreground">{value.toFixed(digits)}</span>
       </span>
       <input type="range" min={min} max={max} step={step} value={value}
         onChange={(e) => onChange(Number(e.target.value))}

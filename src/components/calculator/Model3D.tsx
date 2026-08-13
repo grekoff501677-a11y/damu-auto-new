@@ -114,11 +114,19 @@ function ModelLoadingOverlay({ loaded }: { loaded: boolean }) {
   )
 }
 
-export function Model3D({ src, modelKey, className, activeNodes = [], nodes, parts }: {
+export function Model3D({
+  src, modelKey, className, activeNodes = [], nodes, parts,
+  showNodeSwarms = true, draggablePartId = null, onPartMove,
+}: {
   src: string; modelKey?: string; poster?: string; className?: string
   activeNodes?: BodyNode[]; nodes?: Node3DRegion[] | null
   /** детали, закреплённые на кузове в админке (/admin/parts-3d) */
   parts?: Part3DPlacement[] | null
+  /** рои точек по узлам ТО; в редакторе мешают — там их гасим */
+  showNodeSwarms?: boolean
+  /** id детали, которую можно таскать курсором (режим редактора) */
+  draggablePartId?: string | null
+  onPartMove?: (id: string, position: [number, number, number]) => void
 }) {
   const [loaded, setLoaded] = useState(false)
   const [normSize, setNormSize] = useState<THREE.Vector3 | null>(null)
@@ -137,6 +145,8 @@ export function Model3D({ src, modelKey, className, activeNodes = [], nodes, par
 
   // деталь под курсором — на это время гасим автовращение, иначе в неё не попасть
   const [partHovered, setPartHovered] = useState(false)
+  // пока деталь тащат, орбита должна молчать целиком
+  const [dragging, setDragging] = useState(false)
 
   // hand-authored regions from DB, else generic defaults from the model bbox
   const regions = useMemo<Node3DRegion[]>(() => {
@@ -192,7 +202,7 @@ export function Model3D({ src, modelKey, className, activeNodes = [], nodes, par
             <Suspense fallback={null}>
               <WireModel url={src} modelKey={modelKey} onReady={onReady} />
             </Suspense>
-            {regions.map((r) => (
+            {showNodeSwarms && regions.map((r) => (
               <NodeSwarm key={r.id} region={r} color={SWARM_COLOR} active={activeNodes.includes(r.bodyNode)} />
             ))}
             {placements.map((p) => (
@@ -204,10 +214,16 @@ export function Model3D({ src, modelKey, className, activeNodes = [], nodes, par
                 label={p.label}
                 active={!!p.bodyNode && activeNodes.includes(p.bodyNode)}
                 onHoverChange={setPartHovered}
+                glowRadius={p.glowRadius}
+                glowDensity={p.glowDensity}
+                draggable={p.id === draggablePartId}
+                onDragMove={(pos) => onPartMove?.(p.id, pos)}
+                onDragStateChange={setDragging}
               />
             ))}
             <OrbitControls
-              autoRotate={!partHovered}
+              enabled={!dragging}
+              autoRotate={!partHovered && !dragging}
               autoRotateSpeed={0.7}
               enableDamping
               enablePan={false}

@@ -8,7 +8,7 @@ import { sampleRegion } from '@/lib/node-regions'
 
 // A glowing particle swarm marking a maintenance node region. Soft additive
 // twinkling dots (computed in-shader, no texture), fading in when active.
-const POINTS = 200
+const DEFAULT_POINTS = 200
 
 const vertex = /* glsl */ `
   attribute float aSize;
@@ -37,17 +37,19 @@ const fragment = /* glsl */ `
   }
 `
 
-export function NodeSwarm({ region, color, active }: { region: Node3DRegion; color: string; active: boolean }) {
+export function NodeSwarm({ region, color, active, points = DEFAULT_POINTS }: {
+  region: Node3DRegion; color: string; active: boolean; points?: number
+}) {
   const matRef = useRef<THREE.ShaderMaterial>(null)
 
   const geom = useMemo(() => {
-    const { positions, sizes, seeds } = sampleRegion(region, POINTS)
+    const { positions, sizes, seeds } = sampleRegion(region, points)
     const g = new THREE.BufferGeometry()
     g.setAttribute('position', new THREE.BufferAttribute(positions, 3))
     g.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1))
     g.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1))
     return g
-  }, [region])
+  }, [region, points])
 
   const uniforms = useMemo(() => ({
     uTime: { value: 0 },

@@ -54,6 +54,10 @@ export type Part3DPlacement = {
   height: number
   /** узел ТО, при активности которого деталь подсвечивается сама */
   bodyNode?: BodyNode
+  /** объём облака искр вокруг детали, в долях её высоты (по умолчанию 1.4) */
+  glowRadius?: number
+  /** густота мерцания — число частиц (по умолчанию 120) */
+  glowDensity?: number
 }
 
 /** A maintenance node region on the 3D model (normalized space, vertical = Y).

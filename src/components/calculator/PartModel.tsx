@@ -1,9 +1,11 @@
 'use client'
 
 import { Component, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import { Html, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
+import { NodeSwarm } from './NodeSwarm'
+import type { BodyNode } from './VehicleBlueprint'
 
 // Деталь рисуется обычным мешем, а не каркасом: кузов — это схема, а деталь —
 // предмет, и разница в подаче как раз и читается.
@@ -35,7 +37,19 @@ type Props = {
   /** узел обслуживания активен — деталь горит сама, без наведения */
   active?: boolean
   onHoverChange?: (hovered: boolean) => void
+  /** объём облака искр в долях высоты детали */
+  glowRadius?: number
+  /** густота мерцания — число частиц */
+  glowDensity?: number
+  /** режим редактора: деталь можно таскать курсором */
+  draggable?: boolean
+  onDragMove?: (position: [number, number, number]) => void
+  onDragStateChange?: (dragging: boolean) => void
 }
+
+const GLOW_COLOR = '#E3D3B3'
+const DEFAULT_GLOW_RADIUS = 1.4
+const DEFAULT_GLOW_DENSITY = 120
 
 // useGLTF на недоступной модели БРОСАЕТ исключение, а <Suspense> ловит промисы,
 // но не ошибки — без границы 404 у детали уносит всю страницу целиком, а не
@@ -60,10 +74,19 @@ export function PartModel(props: Props) {
   )
 }
 
-function PartModelInner({ url, position, height, label, active = false, onHoverChange }: Props) {
+function PartModelInner({
+  url, position, height, label, active = false, onHoverChange,
+  glowRadius = DEFAULT_GLOW_RADIUS, glowDensity = DEFAULT_GLOW_DENSITY,
+  draggable = false, onDragMove, onDragStateChange,
+}: Props) {
   const { scene } = useGLTF(url)
   const [hovered, setHovered] = useState(false)
+  const [dragging, setDragging] = useState(false)
   const groupRef = useRef<THREE.Group>(null)
+  const { camera, gl } = useThree()
+  // плоскость перетаскивания и смещение «курсор → центр детали»
+  const planeRef = useRef(new THREE.Plane())
+  const grabRef = useRef(new THREE.Vector3())
   // Клонируем сцену и вешаем свои материалы: исходник переиспользуется между
   // инстансами, а emissive мы гасим/зажигаем покадрово и не должны его делить.
   const object = useMemo(() => {
@@ -106,6 +129,53 @@ function PartModelInner({ url, position, height, label, active = false, onHoverC
 
   useEffect(() => { onHoverChange?.(hovered) }, [hovered, onHoverChange])
 
+  // Тащим в плоскости, обращённой к камере: по экрану деталь идёт ровно за
+  // курсором, а третья ось набирается поворотом сцены. Слушаем окно, а не меш —
+  // курсор во время перетаскивания regularly уходит с детали.
+  useEffect(() => {
+    if (!dragging) return
+    const el = gl.domElement
+    const ray = new THREE.Raycaster()
+    const hit = new THREE.Vector3()
+
+    const move = (ev: PointerEvent) => {
+      const rect = el.getBoundingClientRect()
+      ray.setFromCamera(new THREE.Vector2(
+        ((ev.clientX - rect.left) / rect.width) * 2 - 1,
+        -((ev.clientY - rect.top) / rect.height) * 2 + 1,
+      ), camera)
+      if (!ray.ray.intersectPlane(planeRef.current, hit)) return
+      hit.add(grabRef.current)
+      const r = (n: number) => Math.round(n * 1000) / 1000
+      onDragMove?.([r(hit.x), r(hit.y), r(hit.z)])
+    }
+    const up = () => setDragging(false)
+
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
+    window.addEventListener('pointercancel', up)
+    return () => {
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+      window.removeEventListener('pointercancel', up)
+    }
+  }, [dragging, camera, gl, onDragMove])
+
+  useEffect(() => { onDragStateChange?.(dragging) }, [dragging, onDragStateChange])
+
+  const startDrag = (e: ThreeEvent<PointerEvent>) => {
+    if (!draggable) return
+    e.stopPropagation()
+    const centre = new THREE.Vector3(...position)
+    const normal = camera.getWorldDirection(new THREE.Vector3()).negate()
+    planeRef.current.setFromNormalAndCoplanarPoint(normal, centre)
+    const hit = new THREE.Vector3()
+    // держим деталь за точку захвата, чтобы она не прыгала центром под курсор
+    grabRef.current.set(0, 0, 0)
+    if (e.ray.intersectPlane(planeRef.current, hit)) grabRef.current.copy(centre).sub(hit)
+    setDragging(true)
+  }
+
   // Свечение: ровное когда узел активен, ярче под курсором, мягкий пульс —
   // чтобы деталь читалась как «живая точка», а не как вставленный объект.
   useFrame(({ clock }) => {
@@ -124,14 +194,32 @@ function PartModelInner({ url, position, height, label, active = false, onHoverC
     group.scale.lerp(new THREE.Vector3(s, s, s), 0.15)
   })
 
+  // Облако искр вокруг детали — то же, чем подсвечиваются узлы ТО, но
+  // сжатое до размеров детали. Центр в нуле: группа уже стоит на месте.
+  const glow = useMemo(() => ({
+    id: 'part-glow',
+    bodyNode: 'engine' as BodyNode, // NodeSwarm его не использует
+    shape: 'sphere' as const,
+    x: 0, y: 0, z: 0,
+    r: height * Math.max(0.2, glowRadius),
+  }), [height, glowRadius])
+
   return (
     <group
       ref={groupRef}
       position={position}
       onPointerOver={(e) => { e.stopPropagation(); setHovered(true) }}
       onPointerOut={(e) => { e.stopPropagation(); setHovered(false) }}
+      onPointerDown={startDrag}
     >
       <primitive object={object} />
+
+      <NodeSwarm
+        region={glow}
+        color={GLOW_COLOR}
+        active={active || hovered || dragging}
+        points={Math.max(0, Math.round(glowDensity))}
+      />
 
       {/* невидимая сфера-хитбокс: сама деталь мелкая, попасть в неё мышью трудно */}
       <mesh visible={false}>
@@ -139,7 +227,7 @@ function PartModelInner({ url, position, height, label, active = false, onHoverC
         <meshBasicMaterial />
       </mesh>
 
-      {hovered && (
+      {(hovered || dragging) && (
         <Html center position={[0, height * 1.15, 0]} distanceFactor={6} style={{ pointerEvents: 'none' }}>
           <span className="whitespace-nowrap rounded-md border border-brand-beige/40 bg-brand-deep/85 px-2 py-1 text-[11px] font-600 text-brand-white backdrop-blur-sm">
             {label}

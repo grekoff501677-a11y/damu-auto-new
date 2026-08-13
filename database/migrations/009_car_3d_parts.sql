@@ -7,7 +7,9 @@
 -- центрирует и масштабирует кузов (вертикаль — Y, длинная ось = 3.4).
 --
 -- Массив объектов:
---   { id, label, url, x, y, z, height, bodyNode? }
+--   { id, label, url, x, y, z, height, bodyNode?, glowRadius?, glowDensity? }
+-- где glowRadius — объём облака искр вокруг детали (в долях её высоты),
+-- glowDensity — густота мерцания (число частиц),
 -- где bodyNode (engine/cooling/cabin/transmission/brakes) — узел ТО, при
 -- активности которого деталь начинает светиться сама, без наведения.
 --
@@ -27,6 +29,6 @@ ALTER TABLE car_models ADD COLUMN IF NOT EXISTS model_3d_parts JSONB NOT NULL DE
 --   "label": "Масляный фильтр",
 --   "url": "https://ekrggwfddacgeolxtuwd.supabase.co/storage/v1/object/public/models/oil-filter.glb",
 --   "x": 0.15, "y": -0.23, "z": 1.12, "height": 0.18,
---   "bodyNode": "engine"
+--   "bodyNode": "engine", "glowRadius": 1.4, "glowDensity": 120
 -- }]'::jsonb
 -- WHERE slug = 'geely-atlas';
