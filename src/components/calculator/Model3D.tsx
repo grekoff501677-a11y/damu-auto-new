@@ -223,7 +223,10 @@ export function Model3D({
             ))}
             <OrbitControls
               enabled={!dragging}
-              autoRotate={!partHovered && !dragging}
+              // на публичной странице вращение не замираем: наведение там —
+              // просто подсветка. Пауза нужна лишь в редакторе, чтобы поймать
+              // деталь курсором для перетаскивания.
+              autoRotate={!dragging && !(partHovered && !!draggablePartId)}
               autoRotateSpeed={0.7}
               enableDamping
               enablePan={false}

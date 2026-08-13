@@ -67,7 +67,10 @@ export function NodeSwarm({ region, color, active, points = DEFAULT_POINTS }: {
   })
 
   return (
-    <points geometry={geom} frustumCulled={false}>
+    // Рой — чистый декор, курсор он ловить не должен. У THREE.Points порог
+    // рейкаста по умолчанию 1 мировая единица, а кузов длиной 3.4: каждая
+    // искра превращалась бы в зону захвата размером почти с полмашины.
+    <points geometry={geom} frustumCulled={false} raycast={() => null}>
       <shaderMaterial
         ref={matRef}
         uniforms={uniforms}

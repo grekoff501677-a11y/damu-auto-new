@@ -47,7 +47,9 @@ type Props = {
   onDragStateChange?: (dragging: boolean) => void
 }
 
-const GLOW_COLOR = '#E3D3B3'
+// Серебро, а не беж: на охряном каркасе тёплые искры сливались с фоном.
+// Это голубой из палитры, выведенный в светлый холодный тон.
+const GLOW_COLOR = '#D9E1E8'
 const DEFAULT_GLOW_RADIUS = 1.4
 const DEFAULT_GLOW_DENSITY = 120
 
@@ -176,13 +178,14 @@ function PartModelInner({
     setDragging(true)
   }
 
-  // Свечение: ровное когда узел активен, ярче под курсором, мягкий пульс —
-  // чтобы деталь читалась как «живая точка», а не как вставленный объект.
+  // Два состояния, взаимоисключающих: покой — вокруг детали роятся искры,
+  // сама она приглушена; под курсором искры гаснут, деталь разгорается
+  // целиком и чуть подрастает.
   useFrame(({ clock }) => {
     const group = groupRef.current
     if (!group) return
-    const target = hovered ? 0.85 : active ? 0.4 : 0.06
-    const pulse = active || hovered ? 1 + 0.18 * Math.sin(clock.elapsedTime * 2.4) : 1
+    const target = hovered ? 0.95 : active ? 0.3 : 0.08
+    const pulse = hovered ? 1 : active ? 1 + 0.18 * Math.sin(clock.elapsedTime * 2.4) : 1
     // деталей семь, обход по графу каждый кадр стоит копейки
     group.traverse((o) => {
       const mesh = o as THREE.Mesh
@@ -190,7 +193,7 @@ function PartModelInner({
       const m = mesh.material
       m.emissiveIntensity += (target * pulse - m.emissiveIntensity) * 0.12
     })
-    const s = hovered ? 1.08 : 1
+    const s = hovered ? 1.14 : 1
     group.scale.lerp(new THREE.Vector3(s, s, s), 0.15)
   })
 
@@ -214,10 +217,12 @@ function PartModelInner({
     >
       <primitive object={object} />
 
+      {/* искры горят всегда и гаснут под курсором — деталь в этот момент
+          подсвечивается сама, и рой ей только мешает */}
       <NodeSwarm
         region={glow}
         color={GLOW_COLOR}
-        active={active || hovered || dragging}
+        active={!hovered && !dragging}
         points={Math.max(0, Math.round(glowDensity))}
       />
 
