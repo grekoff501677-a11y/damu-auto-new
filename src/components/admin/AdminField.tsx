@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils'
 
-const baseInput =
+export const baseInput =
   'w-full rounded-xl border border-input bg-surface/60 px-4 py-2.5 text-sm text-foreground outline-none transition-all duration-200 focus:border-accent focus:shadow-[0_0_0_3px_rgba(192,157,81,0.14)] min-h-11'
 
 export function Label({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) {

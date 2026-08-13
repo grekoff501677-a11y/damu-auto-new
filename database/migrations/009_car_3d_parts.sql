@@ -1,0 +1,32 @@
+-- ============================================================
+-- Migration 009 — Детали (GLB), закреплённые на 3D-модели авто
+-- Запустить в Supabase SQL Editor.
+-- ============================================================
+-- В отличие от кузова, деталь рисуется телом с материалами, а не каркасом,
+-- и живёт в НОРМАЛИЗОВАННОМ пространстве модели — том же, к которому Model3D
+-- центрирует и масштабирует кузов (вертикаль — Y, длинная ось = 3.4).
+--
+-- Массив объектов:
+--   { id, label, url, x, y, z, height, bodyNode? }
+-- где bodyNode (engine/cooling/cabin/transmission/brakes) — узел ТО, при
+-- активности которого деталь начинает светиться сама, без наведения.
+--
+-- Позиция задаётся в админке (/admin/parts-3d) с живым превью, а не в коде:
+-- у каждой модели свой кузов, и «под двигателем» на глаз не угадывается.
+-- Пустой массив → деталей на схеме нет.
+
+ALTER TABLE car_models ADD COLUMN IF NOT EXISTS model_3d_parts JSONB NOT NULL DEFAULT '[]'::jsonb;
+
+-- Пример: масляный фильтр для Атласа. Раскомментировать ПОСЛЕ заливки
+-- oil-filter.glb в публичный бакет "models" (scripts/upload-3d.mjs) и
+-- подгонки координат в админке.
+--
+-- UPDATE car_models
+-- SET model_3d_parts = '[{
+--   "id": "oil-filter",
+--   "label": "Масляный фильтр",
+--   "url": "https://ekrggwfddacgeolxtuwd.supabase.co/storage/v1/object/public/models/oil-filter.glb",
+--   "x": 0.15, "y": -0.23, "z": 1.12, "height": 0.18,
+--   "bodyNode": "engine"
+-- }]'::jsonb
+-- WHERE slug = 'geely-atlas';

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Component, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Html, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
@@ -37,7 +37,30 @@ type Props = {
   onHoverChange?: (hovered: boolean) => void
 }
 
-export function PartModel({ url, position, height, label, active = false, onHoverChange }: Props) {
+// useGLTF на недоступной модели БРОСАЕТ исключение, а <Suspense> ловит промисы,
+// но не ошибки — без границы 404 у детали уносит всю страницу целиком, а не
+// только 3D-блок. Граница вшита в сам компонент, чтобы её нельзя было забыть.
+class PartBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false }
+  static getDerivedStateFromError() { return { failed: true } }
+  componentDidCatch(error: unknown) {
+    console.warn('[PartModel] деталь не загрузилась, схема отрисована без неё:', error)
+  }
+  render() { return this.state.failed ? null : this.props.children }
+}
+
+export function PartModel(props: Props) {
+  return (
+    // key по url: сменили ссылку — граница пробует загрузить заново
+    <PartBoundary key={props.url}>
+      <Suspense fallback={null}>
+        <PartModelInner {...props} />
+      </Suspense>
+    </PartBoundary>
+  )
+}
+
+function PartModelInner({ url, position, height, label, active = false, onHoverChange }: Props) {
   const { scene } = useGLTF(url)
   const [hovered, setHovered] = useState(false)
   const groupRef = useRef<THREE.Group>(null)

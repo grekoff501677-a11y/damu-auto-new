@@ -8,20 +8,10 @@ import { Loader2, RotateCw } from 'lucide-react'
 import { NodeSwarm } from './NodeSwarm'
 import { PartModel } from './PartModel'
 import type { BodyNode } from './VehicleBlueprint'
-import type { Node3DRegion } from '@/lib/types'
+import type { Node3DRegion, Part3DPlacement } from '@/lib/types'
 import { defaultRegions } from '@/lib/node-regions'
 
 const SWARM_COLOR = '#F8F4ED' // active node glow (белый — ярче охряного каркаса)
-
-// Масляный фильтр: STEP из SolidWorks → GLB (см. scripts/prep-part-glb.mjs),
-// лежит в том же бакете "models", что и кузова.
-const OIL_FILTER_URL =
-  'https://ekrggwfddacgeolxtuwd.supabase.co/storage/v1/object/public/models/oil-filter.glb'
-
-// Реальный фильтр — ~90 мм против 4.6 м кузова, то есть 5% его высоты: в кадре
-// это несколько пикселей. Увеличиваем примерно впятеро — обычная условность
-// схемы, зато деталь видно и в неё можно попасть курсором.
-const FILTER_SCALE = 0.42
 
 // Significant edges only: this keeps high-poly cars readable and cuts the
 // amount of generated line geometry versus drawing every triangle edge.
@@ -124,9 +114,11 @@ function ModelLoadingOverlay({ loaded }: { loaded: boolean }) {
   )
 }
 
-export function Model3D({ src, modelKey, className, activeNodes = [], nodes }: {
+export function Model3D({ src, modelKey, className, activeNodes = [], nodes, parts }: {
   src: string; modelKey?: string; poster?: string; className?: string
   activeNodes?: BodyNode[]; nodes?: Node3DRegion[] | null
+  /** детали, закреплённые на кузове в админке (/admin/parts-3d) */
+  parts?: Part3DPlacement[] | null
 }) {
   const [loaded, setLoaded] = useState(false)
   const [normSize, setNormSize] = useState<THREE.Vector3 | null>(null)
@@ -152,20 +144,7 @@ export function Model3D({ src, modelKey, className, activeNodes = [], nodes }: {
     return normSize ? defaultRegions(normSize) : []
   }, [nodes, normSize])
 
-  // Фильтр не прибиваем к координатам, а привязываем к узлу двигателя: если
-  // регионы переразметят в админ-редакторе, деталь останется под мотором.
-  const filter = useMemo(() => {
-    const engine = regions.find((r) => r.bodyNode === 'engine')
-    if (!engine) return null
-    const reach = engine.shape === 'box'
-      ? Math.min(engine.sx ?? 0.5, engine.sy ?? 0.5, engine.sz ?? 0.5)
-      : engine.r ?? 0.5
-    return {
-      // вбок от осевой, вниз под блок и чуть вперёд — где фильтр и стоит
-      position: [engine.x + reach * 0.36, engine.y - reach * 0.45, engine.z + reach * 0.15] as [number, number, number],
-      height: reach * FILTER_SCALE,
-    }
-  }, [regions])
+  const placements = useMemo(() => (Array.isArray(parts) ? parts : []).filter((p) => p.url), [parts])
 
   useEffect(() => {
     let r2 = 0
@@ -216,18 +195,17 @@ export function Model3D({ src, modelKey, className, activeNodes = [], nodes }: {
             {regions.map((r) => (
               <NodeSwarm key={r.id} region={r} color={SWARM_COLOR} active={activeNodes.includes(r.bodyNode)} />
             ))}
-            {filter && (
-              <Suspense fallback={null}>
-                <PartModel
-                  url={OIL_FILTER_URL}
-                  position={filter.position}
-                  height={filter.height}
-                  label="Масляный фильтр"
-                  active={activeNodes.includes('engine')}
-                  onHoverChange={setPartHovered}
-                />
-              </Suspense>
-            )}
+            {placements.map((p) => (
+              <PartModel
+                key={p.id}
+                url={p.url}
+                position={[p.x, p.y, p.z]}
+                height={p.height}
+                label={p.label}
+                active={!!p.bodyNode && activeNodes.includes(p.bodyNode)}
+                onHoverChange={setPartHovered}
+              />
+            ))}
             <OrbitControls
               autoRotate={!partHovered}
               autoRotateSpeed={0.7}

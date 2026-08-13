@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { Package, FileText, Wrench, Users, Car, LayoutGrid } from 'lucide-react'
+import { Package, FileText, Wrench, Users, Car, LayoutGrid, Box } from 'lucide-react'
 
 const SECTIONS = [
   { href: '/admin/sections',   icon: LayoutGrid, title: 'Конструктор главной', desc: 'Порядок, видимость и тексты секций главной страницы' },
@@ -8,6 +8,7 @@ const SECTIONS = [
   { href: '/admin/blog',       icon: FileText, title: 'Блог / Статьи',  desc: 'Публикация обновлений и гайдов «Оригинал vs Подделка»' },
   { href: '/admin/calculator', icon: Wrench,   title: 'Калькулятор ТО', desc: 'Матрица интервалов замены и проверки по моделям' },
   { href: '/admin/blueprints', icon: Car,      title: 'Схемы авто',     desc: 'Изображения моделей и интерактивные точки для блока ТО' },
+  { href: '/admin/parts-3d',   icon: Box,      title: 'Детали на 3D',   desc: 'Закрепление деталей (.glb) на кузове в блоке ТО' },
   { href: '/admin/leads',      icon: Users,    title: 'Заявки',         desc: 'Просмотр входящих заявок с сайта' },
 ]
 

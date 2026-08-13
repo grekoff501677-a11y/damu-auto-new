@@ -37,6 +37,23 @@ export type CarModel = {
   model_3d_url?: string | null
   // 3D node regions (particle-swarm highlights) in normalized model space
   model_3d_nodes?: Node3DRegion[] | null
+  // отдельные детали (GLB), закреплённые на кузове в админке
+  model_3d_parts?: Part3DPlacement[] | null
+}
+
+/** Деталь, закреплённая на 3D-модели: рисуется телом, а не каркасом.
+ *  Координаты — в нормализованном пространстве модели (см. Node3DRegion). */
+export type Part3DPlacement = {
+  id: string
+  /** подпись при наведении, например «Масляный фильтр» */
+  label: string
+  /** ссылка на оптимизированный .glb детали */
+  url: string
+  x: number; y: number; z: number
+  /** высота детали в том же пространстве */
+  height: number
+  /** узел ТО, при активности которого деталь подсвечивается сама */
+  bodyNode?: BodyNode
 }
 
 /** A maintenance node region on the 3D model (normalized space, vertical = Y).

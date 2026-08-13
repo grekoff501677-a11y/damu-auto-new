@@ -79,6 +79,7 @@ export function MaintenanceCenter({ models }: { models: PublicMaintModel[] }) {
                 poster={model.blueprint?.image}
                 activeNodes={activeNodes}
                 nodes={model.nodes3d}
+                parts={model.parts3d}
                 className={cn('h-[340px] w-full max-w-xl sm:h-[380px]', !hasMilestones && 'max-w-4xl sm:h-[460px]')}
               />
             ) : (
